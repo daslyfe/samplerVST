@@ -21,38 +21,29 @@ ADSRComponent::ADSRComponent(NewProjectAudioProcessor& p) : audioProcessor (p)
     // initialise any special settings that your component needs.
 //    std::list<juce::Slider> lst1;
 //    lst1.push_back(mAttackSlider);
-
-    initializeKnob(mAttackSlider, "Attack");
-    addAndMakeVisible(mAttackSlider);
-    mAttackAttatchment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.getAPVTS(), "ATTACK", mAttackSlider);
-
-    mDecaySlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
-    mDecaySlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 40, 20);
-    addAndMakeVisible(mDecaySlider);
-    mDecayLabel.setFont(10.0f);
-    mDecayLabel.setText("Decay", juce::NotificationType::dontSendNotification);
-    mDecayLabel.setJustificationType(juce::Justification::centred);
-    mDecayLabel.attachToComponent(&mDecaySlider, false);
-    mDecayAttatchment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.getAPVTS(), "DECAY", mDecaySlider);
-
-    mSustainSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
-    mSustainSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 40, 20);
-    addAndMakeVisible(mSustainSlider);
-    mSustainLabel.setFont(10.0f);
-    mSustainLabel.setText("Sustain", juce::NotificationType::dontSendNotification);
-    mSustainLabel.setJustificationType(juce::Justification::centred);
-    mSustainLabel.attachToComponent(&mSustainSlider, false);
-    mSustainAttatchment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.getAPVTS(), "SUSTAIN", mSustainSlider);
+ 
+    
+    vcaAtttackSlider.name = "Attack";
+    vcaAtttackSlider.attatchmentName = "ATTACK";
+    makeNewSlider(vcaAtttackSlider, audioProcessor.getAPVTS());
+    addAndMakeVisible(vcaAtttackSlider.slider);
+    
+    vcaDecaySlider.name = "Decay";
+    vcaDecaySlider.attatchmentName = "DECAY";
+    makeNewSlider(vcaDecaySlider, audioProcessor.getAPVTS());
+    addAndMakeVisible(vcaDecaySlider.slider);
+    
+    vcaSustainSlider.name = "Sustain";
+    vcaSustainSlider.attatchmentName = "SUSTAIN";
+    makeNewSlider(vcaSustainSlider, audioProcessor.getAPVTS());
+    addAndMakeVisible(vcaSustainSlider.slider);
     
     
-    mReleaseSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
-    mReleaseSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 40, 20);
-    addAndMakeVisible(mReleaseSlider);
-    mReleaseLabel.setFont(10.0f);
-    mReleaseLabel.setText("Release", juce::NotificationType::dontSendNotification);
-    mReleaseLabel.setJustificationType(juce::Justification::centred);
-    mReleaseLabel.attachToComponent(&mReleaseSlider, false);
-    mReleaseAttatchment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.getAPVTS(), "RELEASE", mReleaseSlider);
+    vcaReleaseSlider.name = "Release";
+    vcaReleaseSlider.attatchmentName = "RELEASE";
+    makeNewSlider(vcaReleaseSlider, audioProcessor.getAPVTS());
+    addAndMakeVisible(vcaReleaseSlider.slider);
+    
     
     
 
@@ -81,9 +72,9 @@ void ADSRComponent::resized()
     const float dialWidth = 0.1f;
     const float dialHeight = 0.7f;
     
-    mAttackSlider.setBoundsRelative(startX, startY, dialWidth, dialHeight);
-    mDecaySlider.setBoundsRelative(startX + dialWidth, startY, dialWidth, dialHeight);
-    mSustainSlider.setBoundsRelative(startX + (dialWidth * 2), startY, dialWidth, dialHeight);
-    mReleaseSlider.setBoundsRelative(startX + (dialWidth * 3), startY, dialWidth, dialHeight);
+    vcaAtttackSlider.slider.setBoundsRelative(startX, startY, dialWidth, dialHeight);
+    vcaDecaySlider.slider.setBoundsRelative(startX + dialWidth, startY, dialWidth, dialHeight);
+    vcaSustainSlider.slider.setBoundsRelative(startX + (dialWidth * 2), startY, dialWidth, dialHeight);
+    vcaReleaseSlider.slider.setBoundsRelative(startX + (dialWidth * 3), startY, dialWidth, dialHeight);
 
 }

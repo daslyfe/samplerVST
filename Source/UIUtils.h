@@ -12,4 +12,14 @@
 
 #pragma once
 
-void initializeKnob(juce::Slider& slider, std::string label);
+class InitSlider {
+public:
+    juce::Slider slider;
+    juce::Label label;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> attatchment;
+    std::string name;
+    std::string attatchmentName;
+};
+
+void initializeKnob(std::string name,  juce::Slider& slider, juce::Label& label);
+void makeNewSlider(InitSlider& sliderObj, juce::AudioProcessorValueTreeState& apvts );
