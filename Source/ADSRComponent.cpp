@@ -17,36 +17,27 @@
 //==============================================================================
 ADSRComponent::ADSRComponent(NewProjectAudioProcessor& p) : audioProcessor (p)
 {
-    // In your constructor, you should add any child components, and
-    // initialise any special settings that your component needs.
-//    std::list<juce::Slider> lst1;
-//    lst1.push_back(mAttackSlider);
- 
-    
+
     vcaAtttackSlider.name = "Attack";
     vcaAtttackSlider.attatchmentName = "ATTACK";
-    makeNewSlider(vcaAtttackSlider, audioProcessor.getAPVTS());
-    addAndMakeVisible(vcaAtttackSlider.slider);
+    vcaSliders.push_back(&vcaAtttackSlider);
     
     vcaDecaySlider.name = "Decay";
     vcaDecaySlider.attatchmentName = "DECAY";
-    makeNewSlider(vcaDecaySlider, audioProcessor.getAPVTS());
-    addAndMakeVisible(vcaDecaySlider.slider);
+    vcaSliders.push_back(&vcaDecaySlider);
     
     vcaSustainSlider.name = "Sustain";
     vcaSustainSlider.attatchmentName = "SUSTAIN";
-    makeNewSlider(vcaSustainSlider, audioProcessor.getAPVTS());
-    addAndMakeVisible(vcaSustainSlider.slider);
-    
+    vcaSliders.push_back(&vcaSustainSlider);
     
     vcaReleaseSlider.name = "Release";
     vcaReleaseSlider.attatchmentName = "RELEASE";
-    makeNewSlider(vcaReleaseSlider, audioProcessor.getAPVTS());
-    addAndMakeVisible(vcaReleaseSlider.slider);
+    vcaSliders.push_back(&vcaReleaseSlider);
     
-    
-    
-
+    for (auto slider : vcaSliders) {
+        makeNewSlider(*slider, audioProcessor.getAPVTS());
+        addAndMakeVisible(slider->slider);
+    }
 }
 
 ADSRComponent::~ADSRComponent()

@@ -36,6 +36,7 @@ private:
     
    
     NewProjectAudioProcessor& audioProcessor;
+    std::vector<InitSlider*> vcaSliders;
     
     
     InitSlider vcaAtttackSlider, vcaDecaySlider, vcaSustainSlider, vcaReleaseSlider;

@@ -21,5 +21,6 @@ public:
     std::string attatchmentName;
 };
 
-void initializeKnob(std::string name,  juce::Slider& slider, juce::Label& label);
+
+
 void makeNewSlider(InitSlider& sliderObj, juce::AudioProcessorValueTreeState& apvts );
