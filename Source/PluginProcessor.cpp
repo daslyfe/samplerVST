@@ -9,6 +9,7 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
+
 //==============================================================================
 NewProjectAudioProcessor::NewProjectAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -264,7 +265,8 @@ void NewProjectAudioProcessor::loadFile(const juce::String& path)
 void NewProjectAudioProcessor::updateADSR()
 {
     
-    // get the pointer address value for the attack slider
+    // load the pointer address value for the sliders, set the values
+
     mADSRParams.attack = mAPVTS.getRawParameterValue("ATTACK")->load();
     mADSRParams.decay = mAPVTS.getRawParameterValue("DECAY")->load();
     mADSRParams.sustain = mAPVTS.getRawParameterValue("SUSTAIN")->load();
@@ -283,8 +285,7 @@ void NewProjectAudioProcessor::updateADSR()
 }
 juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::createParameters()
 {
-    // creates an array of parameter pointers
-    std::vector<std::unique_ptr<juce::RangedAudioParameter>> mAPVTSParams;
+    //std::vector<std::unique_ptr<juce::RangedAudioParameter>> mAPVTSParams;
     
     mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("ATTACK", "Attack", 0.0f, 5.0f, 0.0f));
     mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("DECAY", "Decay", 0.0f, 3.0f, 2.0f));
@@ -299,7 +300,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
 void NewProjectAudioProcessor::valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged, const juce::Identifier& property)
 {
     mShouldUpdate = true;
-    
+
 }
 
 //==============================================================================

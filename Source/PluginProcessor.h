@@ -67,6 +67,8 @@ public:
     juce::ADSR::Parameters& getADSRParams() {return mADSRParams;}
     juce::AudioProcessorValueTreeState::ParameterLayout createParameters();
     juce::AudioProcessorValueTreeState& getAPVTS() {return mAPVTS;}
+    // parameter pointers
+    std::vector<std::unique_ptr<juce::RangedAudioParameter>> mAPVTSParams;
    
 //    std::atomic<bool>& isNotePlayed() {return mIsNotePlayed;}
 //    std::atomic<int>& getSampleCount() {return mSampleCount;}
@@ -77,6 +79,7 @@ private:
     juce::AudioBuffer<float> mWaveForm;
     juce::dsp::LadderFilter<float> mFilter;
     juce::ADSR::Parameters mADSRParams;
+
     
     juce::AudioFormatManager mFormatManager;
     juce::AudioFormatReader* mFormatReader {nullptr};

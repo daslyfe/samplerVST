@@ -36,10 +36,11 @@ private:
     
    
     NewProjectAudioProcessor& audioProcessor;
-    std::vector<InitSlider*> vcaSliders;
-    
+    // std::vector<InitSlider*> vcaSliders;
     
     InitSlider vcaAtttackSlider, vcaDecaySlider, vcaSustainSlider, vcaReleaseSlider;
+    InitSlider* vcaSliders[4] = {&vcaAtttackSlider, &vcaDecaySlider, &vcaSustainSlider, &vcaReleaseSlider};
+
     
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ADSRComponent)
