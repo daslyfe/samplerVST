@@ -19,20 +19,18 @@ ADSRComponent::ADSRComponent(NewProjectAudioProcessor& p) : audioProcessor (p)
 {
     vcaAtttackSlider.name = "Attack";
     vcaAtttackSlider.attatchmentName = "ATTACK";
-    vcaAtttackSlider.maxValue = 5.0f;
+
     
     vcaDecaySlider.name = "Decay";
     vcaDecaySlider.attatchmentName = "DECAY";
-    vcaDecaySlider.maxValue = 3.0f;
-    vcaDecaySlider.defaultValue = 2.0f;
 
     vcaSustainSlider.name = "Sustain";
     vcaSustainSlider.attatchmentName = "SUSTAIN";
-    vcaSustainSlider.defaultValue = 1.0f;
+
     
     vcaReleaseSlider.name = "Release";
     vcaReleaseSlider.attatchmentName = "RELEASE";
-    vcaReleaseSlider.maxValue = 5.0f;
+   
     
     for (auto slider : vcaSliders) {
         makeNewSlider(*slider, audioProcessor.getAPVTS());

@@ -36,13 +36,3 @@ void makeNewSlider(InitSlider& sliderObj, juce::AudioProcessorValueTreeState& ap
 }
 
 
-juce::AudioProcessorValueTreeState::ParameterLayout createParametersFromSliders(std::vector<InitSlider*> sliders) {
-    
-    std::vector<std::unique_ptr<juce::RangedAudioParameter>> mAPVTSParams;
-    for (auto slider : sliders) {
-        mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>(slider->attatchmentName, slider->name, slider->minValue, slider->maxValue, slider->defaultValue));
-    }
-    
- 
-    return {mAPVTSParams.begin(), mAPVTSParams.end()};
-}
