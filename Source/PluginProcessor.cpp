@@ -110,11 +110,10 @@ void NewProjectAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
    
     
     mFilter.reset();
-    mFilter.setCutoffFrequencyHz(440.0f);
+   
     mFilter.setEnabled(true);
     mFilter.setMode(juce::dsp::LadderFilterMode::LPF24);
-    mFilter.setResonance(0.25f);
-    mFilter.setDrive(1.0f);
+   
     
     
     
@@ -271,6 +270,11 @@ void NewProjectAudioProcessor::updateADSR()
     mADSRParams.decay = mAPVTS.getRawParameterValue("DECAY")->load();
     mADSRParams.sustain = mAPVTS.getRawParameterValue("SUSTAIN")->load();
     mADSRParams.release = mAPVTS.getRawParameterValue("RELEASE")->load();
+    mFilter.setResonance(mAPVTS.getRawParameterValue("FILTER_RES")->load());
+    mFilter.setCutoffFrequencyHz(mAPVTS.getRawParameterValue("FILTER_CUTOFF")->load());
+    mFilter.setDrive(mAPVTS.getRawParameterValue("FILTER_DRIVE")->load());
+    
+    // mFilter.setDrive(1.0f);
     
     for (int i = 0; i < mSampler.getNumSounds(); ++i)
     {
@@ -291,6 +295,10 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
     mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("DECAY", "Decay", 0.0f, 3.0f, 2.0f));
     mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("SUSTAIN", "Sustain", 0.0f, 1.0f, 1.0f));
     mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("RELEASE", "Release", 0.0f, 5.0f, 0.0f));
+    
+    mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("FILTER_CUTOFF", "Cutoff", 30.0f, 20000.0f, 20000.0f));
+    mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("FILTER_RES", "Res", 0.0f, 1.0f, 0.0f));
+    mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("FILTER_DRIVE", "Drive", 1.0f, 10.0f, 1.0f));
     
 
     

@@ -12,6 +12,8 @@
 #include "PluginProcessor.h"
 #include "WaveThumbnail.h"
 #include "ADSRComponent.h"
+#include "FilterComponent.h"
+
 
 //==============================================================================
 /**
@@ -33,10 +35,12 @@ public:
 
 private:
     juce::TextButton mLoadButton {"Load"};
+    
  
     WaveThumbnail mWaveThumbnail;
     
     ADSRComponent mADSR;
+    FilterComponent mFilter;
     
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.

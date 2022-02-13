@@ -17,9 +17,13 @@
       <FILE id="iXAxGI" name="WaveThumbnail.h" compile="0" resource="0" file="Source/WaveThumbnail.h"/>
       <FILE id="kS6CUK" name="ADSRComponent.cpp" compile="1" resource="0"
             file="Source/ADSRComponent.cpp"/>
+      <FILE id="iuHnAf" name="ADSRComponent.h" compile="0" resource="0" file="Source/ADSRComponent.h"/>
+      <FILE id="Ge2fRD" name="FilterComponent.cpp" compile="1" resource="0"
+            file="Source/FilterComponent.cpp"/>
+      <FILE id="BRWeg0" name="FilterComponent.h" compile="0" resource="0"
+            file="Source/FilterComponent.h"/>
       <FILE id="cwjaQf" name="UIUtils.cpp" compile="1" resource="0" file="Source/UIUtils.cpp"/>
       <FILE id="Q4BI0r" name="UIUtils.h" compile="0" resource="0" file="Source/UIUtils.h"/>
-      <FILE id="iuHnAf" name="ADSRComponent.h" compile="0" resource="0" file="Source/ADSRComponent.h"/>
     </GROUP>
   </MAINGROUP>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"/>
