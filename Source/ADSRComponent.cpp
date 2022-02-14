@@ -63,7 +63,7 @@ void ADSRComponent::resized()
     // components that your component contains..
     
     const float YPos = 0.2f;
-    float xOffset = 0.6f;
+    float xOffset = 0.0f;
     
     for (auto slider : vcaSliders) {
         slider->slider.setBoundsRelative(xOffset, YPos, slider->dialWidth, slider->dialHeight);

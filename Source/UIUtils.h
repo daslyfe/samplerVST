@@ -22,7 +22,7 @@ public:
 //    float minValue {0.0f};
 //    float maxValue {1.0f};
 //    float defaultValue {0.0f};
-    float dialWidth  {0.1f};
+    float dialWidth  {0.2f};
     float dialHeight {0.7f};
     juce::Colour labelColor {juce::Colours::white};
     juce::Colour color {juce::Colours::red};

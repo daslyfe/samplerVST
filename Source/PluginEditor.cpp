@@ -60,8 +60,10 @@ void NewProjectAudioProcessorEditor::paint (juce::Graphics& g)
 void NewProjectAudioProcessorEditor::resized()
 {
     mWaveThumbnail.setBoundsRelative(0.0f, 0.25f, 1.0f, 0.5f);
-    mADSR.setBoundsRelative(0.0f, 0.75f, 1.0f, 0.25f);
-    mFilter.setBoundsRelative(0.0f, 0.75f, 1.0f, 0.25f);
+    mADSR.setBoundsRelative(0.0f, 0.75f, 0.5f, 0.25f);
+    mFilter.setBoundsRelative(0.5f, 0.75f, 0.5f, 0.25f);
+ 
+    
     
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..

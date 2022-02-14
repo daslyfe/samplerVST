@@ -274,6 +274,7 @@ void NewProjectAudioProcessor::updateADSR()
     mFilter.setCutoffFrequencyHz(mAPVTS.getRawParameterValue("FILTER_CUTOFF")->load());
     mFilter.setDrive(mAPVTS.getRawParameterValue("FILTER_DRIVE")->load());
     
+    
     // mFilter.setDrive(1.0f);
     
     for (int i = 0; i < mSampler.getNumSounds(); ++i)
@@ -295,8 +296,10 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
     mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("DECAY", "Decay", 0.0f, 3.0f, 2.0f));
     mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("SUSTAIN", "Sustain", 0.0f, 1.0f, 1.0f));
     mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("RELEASE", "Release", 0.0f, 5.0f, 0.0f));
+    auto filterCutoffRange = juce::NormalisableRange<float>(30.0f, 20000.0f);
+    filterCutoffRange.setSkewForCentre(1200.0f);
     
-    mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("FILTER_CUTOFF", "Cutoff", 30.0f, 20000.0f, 20000.0f));
+    mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("FILTER_CUTOFF", "Cutoff", filterCutoffRange, 20000.0f));
     mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("FILTER_RES", "Res", 0.0f, 1.0f, 0.0f));
     mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("FILTER_DRIVE", "Drive", 1.0f, 10.0f, 1.0f));
     

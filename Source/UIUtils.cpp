@@ -29,6 +29,8 @@ void makeNewSlider(InitSlider& sliderObj, juce::AudioProcessorValueTreeState& ap
     sliderObj.label.setJustificationType(juce::Justification::centred);
     sliderObj.label.attachToComponent(&sliderObj.slider, false);
     
+   
+    
     sliderObj.attatchment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(apvts, sliderObj.attatchmentName, sliderObj.slider);
     
     
