@@ -14,7 +14,7 @@
 // constructor
 NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor (NewProjectAudioProcessor& p)
 // instantiation list
-    : AudioProcessorEditor (&p), mWaveThumbnail(p), mADSR(p), mFilter(p),  audioProcessor (p)
+    : AudioProcessorEditor (&p), mWaveThumbnail(p), mADSR(p), mFilter(p), mFilterADSR(p),  audioProcessor (p)
 {
 
     
@@ -22,6 +22,7 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor (NewProjectAudioP
     addAndMakeVisible(mWaveThumbnail);
     addAndMakeVisible(mADSR);
     addAndMakeVisible(mFilter);
+    addAndMakeVisible(mFilterADSR);
 
     
 //juce:startTimerHz(30);
@@ -60,9 +61,10 @@ void NewProjectAudioProcessorEditor::paint (juce::Graphics& g)
 void NewProjectAudioProcessorEditor::resized()
 {
     mWaveThumbnail.setBoundsRelative(0.0f, 0.25f, 1.0f, 0.5f);
-    mADSR.setBoundsRelative(0.0f, 0.75f, 0.5f, 0.25f);
+    mADSR.setBoundsRelative(0.0f, 0.0f, 0.5f, 0.25f);
     mFilter.setBoundsRelative(0.5f, 0.75f, 0.5f, 0.25f);
- 
+    mFilterADSR.setBoundsRelative(0.0f, 0.75f, 0.5f, 0.25f);
+
     
     
     // This is generally where you'll want to lay out the positions of any

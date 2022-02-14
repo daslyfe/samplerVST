@@ -159,16 +159,17 @@ void NewProjectAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
     
- 
 
 
-    for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
-        buffer.clear (i, 0, buffer.getNumSamples());
+    for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)  {
+        buffer.clear (i, 0, buffer.getNumSamples()); }
     
     mSampler.renderNextBlock(buffer, midiMessages, 0,  buffer.getNumSamples());
     
+    
     juce::dsp::AudioBlock<float> sampleBlock(buffer);
     mFilter.process(juce::dsp::ProcessContextReplacing<float>(sampleBlock));
+    
     
     if (mShouldUpdate)
     {
@@ -264,8 +265,8 @@ void NewProjectAudioProcessor::loadFile(const juce::String& path)
 void NewProjectAudioProcessor::updateADSR()
 {
     
+   
     // load the pointer address value for the sliders, set the values
-
     mADSRParams.attack = mAPVTS.getRawParameterValue("ATTACK")->load();
     mADSRParams.decay = mAPVTS.getRawParameterValue("DECAY")->load();
     mADSRParams.sustain = mAPVTS.getRawParameterValue("SUSTAIN")->load();
@@ -274,7 +275,6 @@ void NewProjectAudioProcessor::updateADSR()
     mFilter.setCutoffFrequencyHz(mAPVTS.getRawParameterValue("FILTER_CUTOFF")->load());
     mFilter.setDrive(mAPVTS.getRawParameterValue("FILTER_DRIVE")->load());
     
-    
     // mFilter.setDrive(1.0f);
     
     for (int i = 0; i < mSampler.getNumSounds(); ++i)
@@ -282,6 +282,7 @@ void NewProjectAudioProcessor::updateADSR()
         if (auto sound = dynamic_cast<juce::SamplerSound*>(mSampler.getSound(i).get()))
         {
             sound->setEnvelopeParameters(mADSRParams);
+                
             
         }
         
@@ -296,12 +297,20 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
     mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("DECAY", "Decay", 0.0f, 3.0f, 2.0f));
     mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("SUSTAIN", "Sustain", 0.0f, 1.0f, 1.0f));
     mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("RELEASE", "Release", 0.0f, 5.0f, 0.0f));
+    
+    mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("FILTER_ATTACK", "Attack", 0.0f, 5.0f, 0.0f));
+    mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("FILTER_DECAY", "Decay", 0.0f, 3.0f, 2.0f));
+    mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("FILTER_SUSTAIN", "Sustain", 0.0f, 1.0f, 1.0f));
+    mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("FILTER_RELEASE", "Release", 0.0f, 5.0f, 0.0f));
+    
     auto filterCutoffRange = juce::NormalisableRange<float>(30.0f, 20000.0f);
     filterCutoffRange.setSkewForCentre(1200.0f);
     
     mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("FILTER_CUTOFF", "Cutoff", filterCutoffRange, 20000.0f));
     mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("FILTER_RES", "Res", 0.0f, 1.0f, 0.0f));
     mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("FILTER_DRIVE", "Drive", 1.0f, 10.0f, 1.0f));
+    
+    
     
 
     

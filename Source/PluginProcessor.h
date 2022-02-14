@@ -79,6 +79,7 @@ private:
     juce::AudioBuffer<float> mWaveForm;
     juce::dsp::LadderFilter<float> mFilter;
     juce::ADSR::Parameters mADSRParams;
+    juce::ADSR::Parameters FilterADSRParams;
 
     
     juce::AudioFormatManager mFormatManager;

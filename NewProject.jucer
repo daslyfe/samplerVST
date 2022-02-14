@@ -18,6 +18,10 @@
       <FILE id="kS6CUK" name="ADSRComponent.cpp" compile="1" resource="0"
             file="Source/ADSRComponent.cpp"/>
       <FILE id="iuHnAf" name="ADSRComponent.h" compile="0" resource="0" file="Source/ADSRComponent.h"/>
+      <FILE id="tPcr7R" name="FilterADSRComponent.cpp" compile="1" resource="0"
+            file="Source/FilterADSRComponent.cpp"/>
+      <FILE id="qiwcti" name="FilterADSRComponent.h" compile="0" resource="0"
+            file="Source/FilterADSRComponent.h"/>
       <FILE id="Ge2fRD" name="FilterComponent.cpp" compile="1" resource="0"
             file="Source/FilterComponent.cpp"/>
       <FILE id="BRWeg0" name="FilterComponent.h" compile="0" resource="0"
