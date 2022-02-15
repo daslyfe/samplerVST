@@ -26,7 +26,7 @@ NewProjectAudioProcessor::NewProjectAudioProcessor()
 {
     mFormatManager.registerBasicFormats();
     for (int i=0; i < mNumVoices; i++ ) {
-        mSampler.addVoice(new juce::SamplerVoice());
+        synth.addVoice(new juce::SamplerVoice());
     }
     mAPVTS.state.addListener(this);
 }
@@ -117,7 +117,7 @@ void NewProjectAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
     
     
     
-    mSampler.setCurrentPlaybackSampleRate(sampleRate);
+    synth.setCurrentPlaybackSampleRate(sampleRate);
     updateADSR();
 }
 
@@ -164,13 +164,13 @@ void NewProjectAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)  {
         buffer.clear (i, 0, buffer.getNumSamples()); }
     
-    mSampler.renderNextBlock(buffer, midiMessages, 0,  buffer.getNumSamples());
+    synth.renderNextBlock(buffer, midiMessages, 0,  buffer.getNumSamples());
+    synth.
     
     
     juce::dsp::AudioBlock<float> sampleBlock(buffer);
     mFilter.process(juce::dsp::ProcessContextReplacing<float>(sampleBlock));
-    
-    
+
     if (mShouldUpdate)
     {
         updateADSR();
@@ -233,7 +233,7 @@ void NewProjectAudioProcessor::setStateInformation (const void* data, int sizeIn
 
 void NewProjectAudioProcessor::loadFileWithMenu()
 {
-    mSampler.clearSounds();
+    synth.clearSounds();
     juce::FileChooser chooser {"Please load a file"};
     if (chooser.browseForFileToOpen())
     {
@@ -242,14 +242,14 @@ void NewProjectAudioProcessor::loadFileWithMenu()
     }
     juce::BigInteger range;
     range.setRange(0, 128, true);
-    mSampler.addSound(new juce::SamplerSound("Sample", *mFormatReader, range, 60, 0.1, 0.1, 10.0));
+    synth.addSound(new juce::SamplerSound("Sample", *mFormatReader, range, 60, 0.1, 0.1, 10.0));
 
     
 }
 
 void NewProjectAudioProcessor::loadFile(const juce::String& path)
 {
-    mSampler.clearSounds();
+    synth.clearSounds();
     auto file = juce::File(path);
     mFormatReader = mFormatManager.createReaderFor(file);
     auto sampleLength = static_cast<int>(mFormatReader->lengthInSamples);
@@ -258,7 +258,7 @@ void NewProjectAudioProcessor::loadFile(const juce::String& path)
 
     juce::BigInteger range;
     range.setRange(0, 128, true);
-    mSampler.addSound(new juce::SamplerSound("Sample", *mFormatReader, range, 60, 0.1, 0.1, 10.0));
+    synth.addSound(new juce::SamplerSound("Sample", *mFormatReader, range, 60, 0.1, 0.1, 10.0));
     updateADSR();
 }
 
@@ -277,9 +277,9 @@ void NewProjectAudioProcessor::updateADSR()
     
     // mFilter.setDrive(1.0f);
     
-    for (int i = 0; i < mSampler.getNumSounds(); ++i)
+    for (int i = 0; i < synth.getNumSounds(); ++i)
     {
-        if (auto sound = dynamic_cast<juce::SamplerSound*>(mSampler.getSound(i).get()))
+        if (auto sound = dynamic_cast<juce::SamplerSound*>(synth.getSound(i).get()))
         {
             sound->setEnvelopeParameters(mADSRParams);
                 

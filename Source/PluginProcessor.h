@@ -56,7 +56,7 @@ public:
     
      void loadFileWithMenu();
     void loadFile(const juce::String& path);
-    int getNumSamplerSounds() {return mSampler.getNumSounds();};
+    int getNumSamplerSounds() {return synth.getNumSounds();};
     
     juce::AudioBuffer<float>& getWaveForm() {return mWaveForm; };
     
@@ -74,7 +74,7 @@ public:
 //    std::atomic<int>& getSampleCount() {return mSampleCount;}
     
 private:
-    juce::Synthesiser mSampler;
+    juce::Synthesiser synth;
     const int mNumVoices {3};
     juce::AudioBuffer<float> mWaveForm;
     juce::dsp::LadderFilter<float> mFilter;
