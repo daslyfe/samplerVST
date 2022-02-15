@@ -165,7 +165,7 @@ void NewProjectAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
         buffer.clear (i, 0, buffer.getNumSamples()); }
     
     synth.renderNextBlock(buffer, midiMessages, 0,  buffer.getNumSamples());
-    synth.
+    
     
     
     juce::dsp::AudioBlock<float> sampleBlock(buffer);
