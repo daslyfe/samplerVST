@@ -26,7 +26,8 @@ NewProjectAudioProcessor::NewProjectAudioProcessor()
 {
     mFormatManager.registerBasicFormats();
     for (int i=0; i < mNumVoices; i++ ) {
-        synth.addVoice(new juce::SamplerVoice());
+//        synth.addVoice(new juce::SamplerVoice());
+        synth.addVoice(new SynthVoice());
     }
     mAPVTS.state.addListener(this);
 }
@@ -101,8 +102,18 @@ void NewProjectAudioProcessor::changeProgramName (int index, const juce::String&
 //==============================================================================
 void NewProjectAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
+    
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
+    
+    for (int i = 0; i < synth.getNumVoices(); i++)
+    {
+        if (auto voice = dynamic_cast<SynthVoice*>(synth.getVoice(i)))
+        {
+            voice->prepareToPlay (sampleRate, samplesPerBlock, getTotalNumOutputChannels());
+        }
+    }
+    
     juce::dsp::ProcessSpec spec;
     spec.maximumBlockSize = samplesPerBlock;
     spec.sampleRate = sampleRate;
@@ -164,17 +175,18 @@ void NewProjectAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)  {
         buffer.clear (i, 0, buffer.getNumSamples()); }
     
+    
+   
+
     synth.renderNextBlock(buffer, midiMessages, 0,  buffer.getNumSamples());
-    
-    
-    
-    juce::dsp::AudioBlock<float> sampleBlock(buffer);
-    mFilter.process(juce::dsp::ProcessContextReplacing<float>(sampleBlock));
+//    juce::dsp::AudioBlock<float> sampleBlock(buffer);
+//    mFilter.process(juce::dsp::ProcessContextReplacing<float>(sampleBlock));
 
     if (mShouldUpdate)
     {
         updateADSR();
     }
+   
     
     
 //    juce::MidiMessage m;

@@ -5,6 +5,14 @@
               defines="JUCE_MODAL_LOOPS_PERMITTED=1" displaySplashScreen="1">
   <MAINGROUP id="VLTn3L" name="jadeSampler">
     <GROUP id="{DAFBC1E4-500C-E22E-2B2E-C075317D6365}" name="Source">
+      <GROUP id="{DD7F9F78-8C50-4B50-4B07-C1F158893B5F}" name="Data">
+        <FILE id="qTfa8S" name="AdsrData.cpp" compile="1" resource="0" file="Source/AdsrData.cpp"/>
+        <FILE id="ukzDqm" name="AdsrData.h" compile="0" resource="0" file="Source/AdsrData.h"/>
+        <FILE id="abYi97" name="FilterData.cpp" compile="1" resource="0" file="Source/FilterData.cpp"/>
+        <FILE id="TxlznY" name="FilterData.h" compile="0" resource="0" file="Source/FilterData.h"/>
+      </GROUP>
+      <FILE id="O0W3ni" name="SynthVoice.cpp" compile="1" resource="0" file="Source/SynthVoice.cpp"/>
+      <FILE id="HdMw1O" name="SynthVoice.h" compile="0" resource="0" file="Source/SynthVoice.h"/>
       <FILE id="eX6WWI" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="iLbTWW" name="PluginProcessor.h" compile="0" resource="0"
