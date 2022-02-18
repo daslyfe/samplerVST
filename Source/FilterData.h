@@ -1,16 +1,14 @@
 /*
-  ==============================================================================
+  =============================================================================
 
-    FilterData.h
-    Created: 15 Feb 2022 8:56:08pm
-    Author:  Jade Rowland
+    FilterData.
+    Created: 15 Feb 2022 8:56:08p
+    Author:  Jade Rowlan
 
-  ==============================================================================
+  =============================================================================
 */
 
 #pragma once
-
-
 #include <JuceHeader.h>
 
 
@@ -28,4 +26,5 @@ public:
 private:
     void selectFilterType (const int type);
     juce::dsp::Oscillator<float> lfo { [](float x) { return std::sin (x); }};
-};
+}
+;

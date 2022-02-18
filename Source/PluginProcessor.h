@@ -9,7 +9,7 @@
 #pragma once
 
 #include <JuceHeader.h>
-#include "SynthVoice.h"
+#include "MSamplerVoice.h"
 
 //==============================================================================
 /**
@@ -76,7 +76,7 @@ public:
     
 private:
     juce::Synthesiser synth;
-    const int mNumVoices {3};
+    const int mNumVoices {8};
     juce::AudioBuffer<float> mWaveForm;
     juce::dsp::LadderFilter<float> mFilter;
     juce::ADSR::Parameters mADSRParams;

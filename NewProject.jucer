@@ -5,20 +5,25 @@
               defines="JUCE_MODAL_LOOPS_PERMITTED=1" displaySplashScreen="1">
   <MAINGROUP id="VLTn3L" name="jadeSampler">
     <GROUP id="{DAFBC1E4-500C-E22E-2B2E-C075317D6365}" name="Source">
+      <GROUP id="{85AF23D1-FC32-A585-1759-CB51447B411B}" name="deprecate">
+        <FILE id="O0W3ni" name="SynthVoice.cpp" compile="1" resource="0" file="Source/SynthVoice.cpp"/>
+        <FILE id="HdMw1O" name="SynthVoice.h" compile="0" resource="0" file="Source/SynthVoice.h"/>
+      </GROUP>
       <GROUP id="{DD7F9F78-8C50-4B50-4B07-C1F158893B5F}" name="Data">
         <FILE id="qTfa8S" name="AdsrData.cpp" compile="1" resource="0" file="Source/AdsrData.cpp"/>
         <FILE id="ukzDqm" name="AdsrData.h" compile="0" resource="0" file="Source/AdsrData.h"/>
         <FILE id="abYi97" name="FilterData.cpp" compile="1" resource="0" file="Source/FilterData.cpp"/>
         <FILE id="TxlznY" name="FilterData.h" compile="0" resource="0" file="Source/FilterData.h"/>
       </GROUP>
-      <FILE id="O0W3ni" name="SynthVoice.cpp" compile="1" resource="0" file="Source/SynthVoice.cpp"/>
-      <FILE id="HdMw1O" name="SynthVoice.h" compile="0" resource="0" file="Source/SynthVoice.h"/>
       <FILE id="eX6WWI" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="iLbTWW" name="PluginProcessor.h" compile="0" resource="0"
             file="Source/PluginProcessor.h"/>
       <FILE id="sAavMM" name="PluginEditor.cpp" compile="1" resource="0"
             file="Source/PluginEditor.cpp"/>
+      <FILE id="GXuFxv" name="MSamplerVoice.cpp" compile="1" resource="0"
+            file="Source/MSamplerVoice.cpp"/>
+      <FILE id="USv65G" name="MSamplerVoice.h" compile="0" resource="0" file="Source/MSamplerVoice.h"/>
       <FILE id="XG68II" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
       <FILE id="B63c0p" name="WaveThumbnail.cpp" compile="1" resource="0"
             file="Source/WaveThumbnail.cpp"/>

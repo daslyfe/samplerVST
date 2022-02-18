@@ -10,6 +10,7 @@
 #include "PluginEditor.h"
 
 
+
 //==============================================================================
 NewProjectAudioProcessor::NewProjectAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -26,8 +27,8 @@ NewProjectAudioProcessor::NewProjectAudioProcessor()
 {
     mFormatManager.registerBasicFormats();
     for (int i=0; i < mNumVoices; i++ ) {
-//        synth.addVoice(new juce::SamplerVoice());
-        synth.addVoice(new SynthVoice());
+//        synth.addVoice(new MSamplerVoice());
+        synth.addVoice(new MSamplerVoice());
     }
     mAPVTS.state.addListener(this);
 }
@@ -106,14 +107,14 @@ void NewProjectAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
     
-    for (int i = 0; i < synth.getNumVoices(); i++)
-    {
-        if (auto voice = dynamic_cast<SynthVoice*>(synth.getVoice(i)))
-        {
-            voice->prepareToPlay (sampleRate, samplesPerBlock, getTotalNumOutputChannels());
-        }
-    }
-    
+//    for (int i = 0; i < synth.getNumVoices(); i++)
+//    {
+//        if (auto voice = dynamic_cast<MSamplerVoice*>(synth.getVoice(i)))
+//        {
+//            voice->prepareToPlay (sampleRate, samplesPerBlock, getTotalNumOutputChannels());
+//        }
+//    }
+//
     juce::dsp::ProcessSpec spec;
     spec.maximumBlockSize = samplesPerBlock;
     spec.sampleRate = sampleRate;
@@ -179,8 +180,8 @@ void NewProjectAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
    
 
     synth.renderNextBlock(buffer, midiMessages, 0,  buffer.getNumSamples());
-//    juce::dsp::AudioBlock<float> sampleBlock(buffer);
-//    mFilter.process(juce::dsp::ProcessContextReplacing<float>(sampleBlock));
+    juce::dsp::AudioBlock<float> sampleBlock(buffer);
+    mFilter.process(juce::dsp::ProcessContextReplacing<float>(sampleBlock));
 
     if (mShouldUpdate)
     {
@@ -254,7 +255,7 @@ void NewProjectAudioProcessor::loadFileWithMenu()
     }
     juce::BigInteger range;
     range.setRange(0, 128, true);
-    synth.addSound(new juce::SamplerSound("Sample", *mFormatReader, range, 60, 0.1, 0.1, 10.0));
+    synth.addSound(new MSamplerSound("Sample", *mFormatReader, range, 60, 0.1, 0.1, 10.0));
 
     
 }
@@ -270,7 +271,7 @@ void NewProjectAudioProcessor::loadFile(const juce::String& path)
 
     juce::BigInteger range;
     range.setRange(0, 128, true);
-    synth.addSound(new juce::SamplerSound("Sample", *mFormatReader, range, 60, 0.1, 0.1, 10.0));
+    synth.addSound(new MSamplerSound("Sample", *mFormatReader, range, 60, 0.1, 0.1, 10.0));
     updateADSR();
 }
 
@@ -291,7 +292,7 @@ void NewProjectAudioProcessor::updateADSR()
     
     for (int i = 0; i < synth.getNumSounds(); ++i)
     {
-        if (auto sound = dynamic_cast<juce::SamplerSound*>(synth.getSound(i).get()))
+        if (auto sound = dynamic_cast<MSamplerSound*>(synth.getSound(i).get()))
         {
             sound->setEnvelopeParameters(mADSRParams);
                 
