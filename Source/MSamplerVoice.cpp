@@ -162,6 +162,7 @@ void MSamplerVoice::renderNextBlock (juce::AudioBuffer<float>& outputBuffer, int
             auto alpha = (float) (sourceSamplePosition - pos);
             auto invAlpha = 1.0f - alpha;
             auto envelopeValue = adsr.getNextSample();
+            filterADSROutput = filterADSR.getNextSample();
 
             // just using a very simple linear interpolation here..
             float l = (inL[pos] * invAlpha + inL[pos + 1] * alpha);
@@ -192,9 +193,7 @@ void MSamplerVoice::renderNextBlock (juce::AudioBuffer<float>& outputBuffer, int
         }
         
 //        juce::dsp::AudioBlock<float> audioBlock {outputBuffer};
-//        filterADSR.applyEnvelopeToBuffer(outputBuffer, 0, outputBuffer.getNumSamples());
-//        filterADSROutput = filterADSR.getNextSample();
-        
+
         for (int ch = 0; ch < outputBuffer.getNumChannels(); ++ ch)
         {
             auto* buffer = outputBuffer.getWritePointer(ch, 0);

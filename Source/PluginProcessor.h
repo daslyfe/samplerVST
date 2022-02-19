@@ -62,6 +62,8 @@ public:
     juce::AudioBuffer<float>& getWaveForm() {return mWaveForm; };
     
     void updateADSR();
+    void setFilterParams();
+    void setParams();
     
     
         

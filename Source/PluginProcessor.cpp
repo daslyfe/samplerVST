@@ -165,6 +165,12 @@ bool NewProjectAudioProcessor::isBusesLayoutSupported (const BusesLayout& layout
 }
 #endif
 
+void NewProjectAudioProcessor::setParams () {
+    updateADSR();
+    setFilterParams();
+    
+}
+
 void NewProjectAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
     juce::ScopedNoDenormals noDenormals;
@@ -184,10 +190,11 @@ void NewProjectAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     juce::dsp::AudioBlock<float> sampleBlock(buffer);
     // mFilter.process(juce::dsp::ProcessContextReplacing<float>(sampleBlock));
 
-    if (mShouldUpdate)
-    {
-        updateADSR();
-    }
+//    if (mShouldUpdate)
+//    {
+        setParams();
+        
+   // }
    
     
     
@@ -273,7 +280,7 @@ void NewProjectAudioProcessor::loadFile(const juce::String& path)
     juce::BigInteger range;
     range.setRange(0, 128, true);
     synth.addSound(new MSamplerSound("Sample", *mFormatReader, range, 60, 0.1, 0.1, 10.0));
-    updateADSR();
+    setParams();
 }
 
 void NewProjectAudioProcessor::updateADSR()
@@ -286,10 +293,7 @@ void NewProjectAudioProcessor::updateADSR()
     mADSRParams.sustain = mAPVTS.getRawParameterValue("SUSTAIN")->load();
     mADSRParams.release = mAPVTS.getRawParameterValue("RELEASE")->load();
     
-    FilterADSRParams.attack = mAPVTS.getRawParameterValue("FILTER_ATTACK")->load();
-    FilterADSRParams.decay = mAPVTS.getRawParameterValue("FILTER_DECAY")->load();
-    FilterADSRParams.sustain = mAPVTS.getRawParameterValue("FILTER_SUSTAIN")->load();
-    FilterADSRParams.release = mAPVTS.getRawParameterValue("FILTER_RELEASE")->load();
+
     
     mFilter.setResonance(mAPVTS.getRawParameterValue("FILTER_RES")->load());
     mFilter.setCutoffFrequencyHz(mAPVTS.getRawParameterValue("FILTER_CUTOFF")->load());
@@ -309,6 +313,32 @@ void NewProjectAudioProcessor::updateADSR()
     }
     
 }
+
+void NewProjectAudioProcessor::setFilterParams()
+{
+   
+    auto& filterCutoff = *mAPVTS.getRawParameterValue ("FILTER_CUTOFF");
+    auto& filterResonance = *mAPVTS.getRawParameterValue ("FILTER_RES");
+    auto& filterType = *mAPVTS.getRawParameterValue ("FILTER_TYPE");
+    auto& adsrDepth = *mAPVTS.getRawParameterValue ("FILTER_ADSR_DEPTH");
+    auto& lfoFreq = *mAPVTS.getRawParameterValue ("LFO1_FREQ");
+    auto& lfoDepth = *mAPVTS.getRawParameterValue ("LFO1_DEPTH");
+    FilterADSRParams.attack = mAPVTS.getRawParameterValue("FILTER_ATTACK")->load();
+    FilterADSRParams.decay = mAPVTS.getRawParameterValue("FILTER_DECAY")->load();
+    FilterADSRParams.sustain = mAPVTS.getRawParameterValue("FILTER_SUSTAIN")->load();
+    FilterADSRParams.release = mAPVTS.getRawParameterValue("FILTER_RELEASE")->load();
+        
+    for (int i = 0; i < synth.getNumVoices(); ++i)
+    {
+        if (auto voice = dynamic_cast<MSamplerVoice*>(synth.getVoice(i)))
+        {
+            voice->updateModParams (filterType, filterCutoff, filterResonance, adsrDepth, lfoFreq, lfoDepth);
+            voice->setFilterEnvelopeParameters(FilterADSRParams);
+
+        }
+    }
+}
+
 juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::createParameters()
 {
     //std::vector<std::unique_ptr<juce::RangedAudioParameter>> mAPVTSParams;
@@ -322,13 +352,19 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
     mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("FILTER_DECAY", "Decay", 0.0f, 3.0f, 2.0f));
     mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("FILTER_SUSTAIN", "Sustain", 0.0f, 1.0f, 1.0f));
     mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("FILTER_RELEASE", "Release", 0.0f, 5.0f, 0.0f));
+    mAPVTSParams.push_back (std::make_unique<juce::AudioParameterFloat>("FILTER_ADSR_DEPTH", "Filter ADSR Depth", juce::NormalisableRange<float> { 0.0f, 10000.0f, 0.1f, 0.3f }, 10000.0f, ""));
     
+    
+    mAPVTSParams.push_back (std::make_unique<juce::AudioParameterChoice>("FILTER_TYPE", "Filter Type", juce::StringArray { "Low Pass", "Band Pass", "High Pass" }, 0));
     auto filterCutoffRange = juce::NormalisableRange<float>(30.0f, 20000.0f);
     filterCutoffRange.setSkewForCentre(1200.0f);
-    
     mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("FILTER_CUTOFF", "Cutoff", filterCutoffRange, 20000.0f));
-    mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("FILTER_RES", "Res", 0.0f, 1.0f, 0.0f));
+    mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("FILTER_RES", "Res", 0.1f, 1.0f, 0.1f));
     mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("FILTER_DRIVE", "Drive", 1.0f, 10.0f, 1.0f));
+    
+    // LFO
+        mAPVTSParams.push_back (std::make_unique<juce::AudioParameterFloat>("LFO1_FREQ", "LFO1 Frequency", juce::NormalisableRange<float> { 0.0f, 20.0f, 0.1f }, 0.0f, "Hz"));
+        mAPVTSParams.push_back (std::make_unique<juce::AudioParameterFloat>("LFO1_DEPTH", "LFO1 Depth", juce::NormalisableRange<float> { 0.0f, 10000.0f, 0.1f, 0.3f }, 0.0f, ""));
     
     
     
