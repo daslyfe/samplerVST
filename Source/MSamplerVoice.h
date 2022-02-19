@@ -2,6 +2,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "FilterData.h"
 
 
 //==============================================================================
@@ -62,7 +63,7 @@ public:
 
     //==============================================================================
     /** Changes the parameters of the ADSR envelope which will be applied to the sample. */
-    void setEnvelopeParameters (juce::ADSR::Parameters parametersToUse)    { params = parametersToUse; }
+    void setVcaEnvelopeParameters (juce::ADSR::Parameters parametersToUse)    { vcaADSRParams = parametersToUse; }
 
     //==============================================================================
     bool appliesToNote (int midiNoteNumber) override;
@@ -78,7 +79,9 @@ private:
     juce::BigInteger midiNotes;
     int length = 0, midiRootNote = 0;
 
-    juce::ADSR::Parameters params;
+    juce::ADSR::Parameters vcaADSRParams;
+
+    
 
     JUCE_LEAK_DETECTOR (MSamplerSound)
 };
@@ -107,23 +110,33 @@ public:
 
     //==============================================================================
     bool canPlaySound (juce::SynthesiserSound*) override;
+    void prepareToPlay (double sampleRate, int samplesPerBlock, int outputChannels);
 
     void startNote (int midiNoteNumber, float velocity, juce::SynthesiserSound*, int pitchWheel) override;
     void stopNote (float velocity, bool allowTailOff) override;
-
+    void setFilterEnvelopeParameters (juce::ADSR::Parameters parametersToUse)    { filterADSRParams = parametersToUse; }
     void pitchWheelMoved (int newValue) override;
     void controllerMoved (int controllerNumber, int newValue) override;
-
+    float getFilterADSROutput() { return filterADSROutput; }
+    
+    void updateModParams (const int filterType, const float filterCutoff, const float filterResonance, const float adsrDepth, const float lfoFreq, const float lfoDepth);
     void renderNextBlock (juce::AudioBuffer<float>&, int startSample, int numSamples) override;
     using SynthesiserVoice::renderNextBlock;
+    
 
 private:
     //==============================================================================
+    static constexpr int numChannelsToProcess { 2 };
     double pitchRatio = 0;
     double sourceSamplePosition = 0;
     float lgain = 0, rgain = 0;
-
+    bool isPrepared { false };
+    juce::ADSR filterADSR;
     juce::ADSR adsr;
+    juce::ADSR::Parameters filterADSRParams;
+    std::array<FilterData, numChannelsToProcess> filter;
+    std::array<juce::dsp::Oscillator<float>, numChannelsToProcess> lfo;
+    float filterADSROutput { 0.0f };
 
     JUCE_LEAK_DETECTOR (MSamplerVoice)
 };

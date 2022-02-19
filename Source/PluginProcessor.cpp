@@ -107,14 +107,14 @@ void NewProjectAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
     
-//    for (int i = 0; i < synth.getNumVoices(); i++)
-//    {
-//        if (auto voice = dynamic_cast<MSamplerVoice*>(synth.getVoice(i)))
-//        {
-//            voice->prepareToPlay (sampleRate, samplesPerBlock, getTotalNumOutputChannels());
-//        }
-//    }
-//
+    for (int i = 0; i < synth.getNumVoices(); i++)
+    {
+        if (auto voice = dynamic_cast<MSamplerVoice*>(synth.getVoice(i)))
+        {
+            voice->prepareToPlay (sampleRate, samplesPerBlock, getTotalNumOutputChannels());
+        }
+    }
+
     juce::dsp::ProcessSpec spec;
     spec.maximumBlockSize = samplesPerBlock;
     spec.sampleRate = sampleRate;
@@ -180,8 +180,9 @@ void NewProjectAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
    
 
     synth.renderNextBlock(buffer, midiMessages, 0,  buffer.getNumSamples());
+    
     juce::dsp::AudioBlock<float> sampleBlock(buffer);
-    mFilter.process(juce::dsp::ProcessContextReplacing<float>(sampleBlock));
+    // mFilter.process(juce::dsp::ProcessContextReplacing<float>(sampleBlock));
 
     if (mShouldUpdate)
     {
@@ -284,6 +285,12 @@ void NewProjectAudioProcessor::updateADSR()
     mADSRParams.decay = mAPVTS.getRawParameterValue("DECAY")->load();
     mADSRParams.sustain = mAPVTS.getRawParameterValue("SUSTAIN")->load();
     mADSRParams.release = mAPVTS.getRawParameterValue("RELEASE")->load();
+    
+    FilterADSRParams.attack = mAPVTS.getRawParameterValue("FILTER_ATTACK")->load();
+    FilterADSRParams.decay = mAPVTS.getRawParameterValue("FILTER_DECAY")->load();
+    FilterADSRParams.sustain = mAPVTS.getRawParameterValue("FILTER_SUSTAIN")->load();
+    FilterADSRParams.release = mAPVTS.getRawParameterValue("FILTER_RELEASE")->load();
+    
     mFilter.setResonance(mAPVTS.getRawParameterValue("FILTER_RES")->load());
     mFilter.setCutoffFrequencyHz(mAPVTS.getRawParameterValue("FILTER_CUTOFF")->load());
     mFilter.setDrive(mAPVTS.getRawParameterValue("FILTER_DRIVE")->load());
@@ -294,7 +301,7 @@ void NewProjectAudioProcessor::updateADSR()
     {
         if (auto sound = dynamic_cast<MSamplerSound*>(synth.getSound(i).get()))
         {
-            sound->setEnvelopeParameters(mADSRParams);
+            sound->setVcaEnvelopeParameters(mADSRParams);
                 
             
         }

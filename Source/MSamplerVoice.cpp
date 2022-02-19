@@ -46,8 +46,8 @@ MSamplerSound::MSamplerSound (const juce::String& soundName,
 
         source.read (data.get(), 0, length + 4, 0, true, true);
 
-        params.attack  = static_cast<float> (attackTimeSecs);
-        params.release = static_cast<float> (releaseTimeSecs);
+        vcaADSRParams.attack  = static_cast<float> (attackTimeSecs);
+        vcaADSRParams.release = static_cast<float> (releaseTimeSecs);
     }
 }
 
@@ -74,6 +74,33 @@ bool MSamplerVoice::canPlaySound (juce::SynthesiserSound* sound)
     return dynamic_cast<const MSamplerSound*> (sound) != nullptr;
 }
 
+
+void MSamplerVoice::prepareToPlay (double sampleRate, int samplesPerBlock, int outputChannels)
+{
+    
+  
+//    reset();
+    
+
+   filterADSR.setSampleRate (sampleRate);
+    filterADSR.setParameters(filterADSRParams);
+    juce::dsp::ProcessSpec spec;
+    spec.maximumBlockSize = samplesPerBlock;
+    spec.sampleRate = sampleRate;
+    spec.numChannels = outputChannels;
+
+    for (int ch = 0; ch < numChannelsToProcess; ch++)
+    {
+        filter[ch].prepareToPlay (sampleRate, samplesPerBlock, outputChannels);
+        lfo[ch].prepare (spec);
+        lfo[ch].initialise ([](float x) { return std::sin (x); });
+    }
+//
+//    gain.prepare (spec);
+//    gain.setGainLinear (0.07f);
+    isPrepared = true;
+}
+
 void MSamplerVoice::startNote (int midiNoteNumber, float velocity, juce::SynthesiserSound* s, int /*currentPitchWheelPosition*/)
 {
     if (auto* sound = dynamic_cast<const MSamplerSound*> (s))
@@ -86,9 +113,11 @@ void MSamplerVoice::startNote (int midiNoteNumber, float velocity, juce::Synthes
         rgain = velocity;
 
         adsr.setSampleRate (sound->sourceSampleRate);
-        adsr.setParameters (sound->params);
+        adsr.setParameters (sound->vcaADSRParams);
 
         adsr.noteOn();
+        
+        
     }
     else
     {
@@ -101,11 +130,13 @@ void MSamplerVoice::stopNote (float /*velocity*/, bool allowTailOff)
     if (allowTailOff)
     {
         adsr.noteOff();
+        filterADSR.noteOff();
     }
     else
     {
         clearCurrentNote();
         adsr.reset();
+        filterADSR.reset();
     }
 }
 
@@ -115,6 +146,7 @@ void MSamplerVoice::controllerMoved (int /*controllerNumber*/, int /*newValue*/)
 //==============================================================================
 void MSamplerVoice::renderNextBlock (juce::AudioBuffer<float>& outputBuffer, int startSample, int numSamples)
 {
+    jassert (isPrepared);
     if (auto* playingSound = static_cast<MSamplerSound*> (getCurrentlyPlayingSound().get()))
     {
         auto& data = *playingSound->data;
@@ -129,16 +161,16 @@ void MSamplerVoice::renderNextBlock (juce::AudioBuffer<float>& outputBuffer, int
             auto pos = (int) sourceSamplePosition;
             auto alpha = (float) (sourceSamplePosition - pos);
             auto invAlpha = 1.0f - alpha;
+            auto envelopeValue = adsr.getNextSample();
 
             // just using a very simple linear interpolation here..
             float l = (inL[pos] * invAlpha + inL[pos + 1] * alpha);
             float r = (inR != nullptr) ? (inR[pos] * invAlpha + inR[pos + 1] * alpha)
                                        : l;
 
-            auto envelopeValue = adsr.getNextSample();
-
             l *= lgain * envelopeValue;
             r *= rgain * envelopeValue;
+            
 
             if (outR != nullptr)
             {
@@ -158,7 +190,51 @@ void MSamplerVoice::renderNextBlock (juce::AudioBuffer<float>& outputBuffer, int
                 break;
             }
         }
+        
+//        juce::dsp::AudioBlock<float> audioBlock {outputBuffer};
+//        filterADSR.applyEnvelopeToBuffer(outputBuffer, 0, outputBuffer.getNumSamples());
+//        filterADSROutput = filterADSR.getNextSample();
+        
+        for (int ch = 0; ch < outputBuffer.getNumChannels(); ++ ch)
+        {
+            auto* buffer = outputBuffer.getWritePointer(ch, 0);
+            
+            
+            for (int s = 0; s < outputBuffer.getNumSamples(); ++s)
+                 {
+                     //lfoOutput[ch] = lfo[ch].processSample (synthBuffer.getSample (ch, s));
+                     buffer[s] = filter[ch].processNextSample (ch, outputBuffer.getSample (ch, s));
+                 }
+            
+            
+        }
+        
+        
+        
     }
 }
 
+void MSamplerVoice::updateModParams (const int filterType, const float filterCutoff, const float filterResonance, const float adsrDepth, const float lfoFreq, const float lfoDepth)
+{
+    auto cutoff = (adsrDepth * filterADSROutput) + filterCutoff;
+    cutoff = std::min(20000.0f, std::max(cutoff, 20.0f));
+   
+
+    for (int ch = 0; ch < numChannelsToProcess; ++ch)
+    {
+        filter[ch].setParams (filterType, cutoff, filterResonance);
+    }
+    
+//    auto cutoff = (adsrDepth * adsr.getNextSample()) + filterCutoff;
+//
+//    DBG (cutoff);
+//
+//    for (int ch = 0; ch < numChannelsToProcess; ++ch)
+//    {
+//        lfo[ch].setFrequency (lfoFreq);
+//        //cutoff = (lfoDepth * lfoOutput[ch]) + cutoff;
+//        cutoff = std::clamp<float> (cutoff, 20.0f, 20000.0f);
+//        filter[ch].setParams (filterType, cutoff, filterResonance);
+//    }
+}
 
