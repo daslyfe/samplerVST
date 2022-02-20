@@ -31,8 +31,8 @@ private:
      NewProjectAudioProcessor& audioProcessor;
 
      
-     InitSlider filterDriveSlider, filterCutoffSlider, filterResSlider;
-     InitSlider* sliders[3] = {&filterDriveSlider, &filterCutoffSlider, &filterResSlider};
+     InitSlider filterDriveSlider, filterCutoffSlider, filterResSlider, filterADSRDepthSlider, filterLFO1DepthSlider;
+     InitSlider* sliders[5] = {&filterDriveSlider, &filterCutoffSlider, &filterResSlider, &filterADSRDepthSlider, &filterLFO1DepthSlider};
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FilterComponent)
 };

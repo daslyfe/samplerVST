@@ -83,7 +83,6 @@ void MSamplerVoice::prepareToPlay (double sampleRate, int samplesPerBlock, int o
     
 
    filterADSR.setSampleRate (sampleRate);
-    filterADSR.setParameters(filterADSRParams);
     adsr.setSampleRate (sampleRate);
 
     juce::dsp::ProcessSpec spec;
@@ -115,8 +114,10 @@ void MSamplerVoice::startNote (int midiNoteNumber, float velocity, juce::Synthes
         rgain = velocity;
 
         adsr.setParameters (sound->vcaADSRParams);
+        filterADSR.setParameters(filterADSRParams);
 
         adsr.noteOn();
+        filterADSR.noteOn();
         
         
     }
@@ -208,6 +209,9 @@ void MSamplerVoice::updateModParams (const int filterType, const float filterCut
     auto cutoff = (adsrDepth * filterADSROutput) + filterCutoff;
     cutoff = std::min(20000.0f, std::max(cutoff, 20.0f));
 
+    if (filterADSROutput > 0) {
+        DBG(filterADSROutput);
+    }
 
     for (int ch = 0; ch < numChannelsToProcess; ++ch)
     {

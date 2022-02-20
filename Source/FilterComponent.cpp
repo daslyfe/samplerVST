@@ -18,16 +18,18 @@ FilterComponent::FilterComponent(NewProjectAudioProcessor& p) : audioProcessor (
     
     filterCutoffSlider.name = "Cutoff";
     filterCutoffSlider.attatchmentName = "FILTER_CUTOFF";
-       // filterCutoffSlider.slider.setRange(30, 20000);
 
-//       filterCutoffSlider.slider.setSkewFactor(0.2);
-//       filterCutoffSlider.slider.setSkewFactorFromMidPoint(500);
-       
        filterResSlider.name = "Res";
        filterResSlider.attatchmentName = "FILTER_RES";
 
        filterDriveSlider.name = "Drive";
        filterDriveSlider.attatchmentName = "FILTER_DRIVE";
+       
+       filterADSRDepthSlider.name = "Env Amt";
+       filterADSRDepthSlider.attatchmentName = "FILTER_ADSR_DEPTH";
+       
+       filterLFO1DepthSlider.name = "Lfo Amt";
+       filterLFO1DepthSlider.attatchmentName = "LFO1_DEPTH";
       
     for (auto slider : sliders) {
         makeNewSlider(*slider, audioProcessor.getAPVTS());

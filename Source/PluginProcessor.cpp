@@ -130,7 +130,7 @@ void NewProjectAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
     
     
     synth.setCurrentPlaybackSampleRate(sampleRate);
-    updateADSR();
+    setParams();
 }
 
 void NewProjectAudioProcessor::releaseResources()
@@ -294,10 +294,6 @@ void NewProjectAudioProcessor::updateADSR()
     mADSRParams.release = mAPVTS.getRawParameterValue("RELEASE")->load();
     
 
-    
-    mFilter.setResonance(mAPVTS.getRawParameterValue("FILTER_RES")->load());
-    mFilter.setCutoffFrequencyHz(mAPVTS.getRawParameterValue("FILTER_CUTOFF")->load());
-    mFilter.setDrive(mAPVTS.getRawParameterValue("FILTER_DRIVE")->load());
     
     // mFilter.setDrive(1.0f);
     
