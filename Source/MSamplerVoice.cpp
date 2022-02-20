@@ -84,6 +84,8 @@ void MSamplerVoice::prepareToPlay (double sampleRate, int samplesPerBlock, int o
 
    filterADSR.setSampleRate (sampleRate);
     filterADSR.setParameters(filterADSRParams);
+    adsr.setSampleRate (sampleRate);
+
     juce::dsp::ProcessSpec spec;
     spec.maximumBlockSize = samplesPerBlock;
     spec.sampleRate = sampleRate;
@@ -112,7 +114,6 @@ void MSamplerVoice::startNote (int midiNoteNumber, float velocity, juce::Synthes
         lgain = velocity;
         rgain = velocity;
 
-        adsr.setSampleRate (sound->sourceSampleRate);
         adsr.setParameters (sound->vcaADSRParams);
 
         adsr.noteOn();
@@ -168,6 +169,10 @@ void MSamplerVoice::renderNextBlock (juce::AudioBuffer<float>& outputBuffer, int
             float l = (inL[pos] * invAlpha + inL[pos + 1] * alpha);
             float r = (inR != nullptr) ? (inR[pos] * invAlpha + inR[pos + 1] * alpha)
                                        : l;
+            
+            l = filter[0].processNextSample (0, l);
+            r = filter[1].processNextSample(0, r);
+              
 
             l *= lgain * envelopeValue;
             r *= rgain * envelopeValue;
@@ -192,21 +197,6 @@ void MSamplerVoice::renderNextBlock (juce::AudioBuffer<float>& outputBuffer, int
             }
         }
         
-//        juce::dsp::AudioBlock<float> audioBlock {outputBuffer};
-
-        for (int ch = 0; ch < outputBuffer.getNumChannels(); ++ ch)
-        {
-            auto* buffer = outputBuffer.getWritePointer(ch, 0);
-            
-            
-            for (int s = 0; s < outputBuffer.getNumSamples(); ++s)
-                 {
-                     //lfoOutput[ch] = lfo[ch].processSample (synthBuffer.getSample (ch, s));
-                     buffer[s] = filter[ch].processNextSample (ch, outputBuffer.getSample (ch, s));
-                 }
-            
-            
-        }
         
         
         
@@ -217,7 +207,7 @@ void MSamplerVoice::updateModParams (const int filterType, const float filterCut
 {
     auto cutoff = (adsrDepth * filterADSROutput) + filterCutoff;
     cutoff = std::min(20000.0f, std::max(cutoff, 20.0f));
-   
+
 
     for (int ch = 0; ch < numChannelsToProcess; ++ch)
     {
