@@ -339,15 +339,15 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
 {
     //std::vector<std::unique_ptr<juce::RangedAudioParameter>> mAPVTSParams;
     
-    mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("ATTACK", "Attack", 0.0f, 5.0f, 0.0f));
+    mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("ATTACK", "Attack", 0.005f, 5.0f, 0.005f));
     mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("DECAY", "Decay", 0.0f, 3.0f, 2.0f));
     mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("SUSTAIN", "Sustain", 0.0f, 1.0f, 1.0f));
-    mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("RELEASE", "Release", 0.0f, 5.0f, 0.0f));
+    mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("RELEASE", "Release", 0.01f, 5.0f, 0.01f));
     
-    mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("FILTER_ATTACK", "Attack", 0.0f, 5.0f, 0.0f));
+    mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("FILTER_ATTACK", "Attack", 0.005f, 5.0f, 0.005f));
     mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("FILTER_DECAY", "Decay", 0.0f, 3.0f, 2.0f));
     mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("FILTER_SUSTAIN", "Sustain", 0.0f, 1.0f, 1.0f));
-    mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("FILTER_RELEASE", "Release", 0.0f, 5.0f, 0.0f));
+    mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("FILTER_RELEASE", "Release", 0.01f, 5.0f, 0.01f));
     mAPVTSParams.push_back (std::make_unique<juce::AudioParameterFloat>("FILTER_ADSR_DEPTH", "Filter ADSR Depth", juce::NormalisableRange<float> { 0.0f, 10000.0f, 0.1f, 0.3f }, 10000.0f, ""));
     
     
@@ -355,7 +355,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
     auto filterCutoffRange = juce::NormalisableRange<float>(30.0f, 20000.0f);
     filterCutoffRange.setSkewForCentre(1200.0f);
     mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("FILTER_CUTOFF", "Cutoff", filterCutoffRange, 20000.0f));
-    mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("FILTER_RES", "Res", 0.1f, 1.0f, 0.1f));
+    mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("FILTER_RES", "Res", 0.1f, 10.0f, 0.1f));
     mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("FILTER_DRIVE", "Drive", 1.0f, 10.0f, 1.0f));
     
     // LFO

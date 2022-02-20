@@ -140,6 +140,7 @@ void MSamplerVoice::stopNote (float /*velocity*/, bool allowTailOff)
         adsr.reset();
         filterADSR.reset();
     }
+
 }
 
 void MSamplerVoice::pitchWheelMoved (int /*newValue*/) {}
@@ -170,9 +171,12 @@ void MSamplerVoice::renderNextBlock (juce::AudioBuffer<float>& outputBuffer, int
             float l = (inL[pos] * invAlpha + inL[pos + 1] * alpha);
             float r = (inR != nullptr) ? (inR[pos] * invAlpha + inR[pos + 1] * alpha)
                                        : l;
+//            for (int i = 0; i < 1; ++i) {
+                l = filter[0].processNextSample (0, l);
+                r = filter[1].processNextSample(1, r);
+//            }
             
-            l = filter[0].processNextSample (0, l);
-            r = filter[1].processNextSample(0, r);
+
               
 
             l *= lgain * envelopeValue;
@@ -209,9 +213,7 @@ void MSamplerVoice::updateModParams (const int filterType, const float filterCut
     auto cutoff = (adsrDepth * filterADSROutput) + filterCutoff;
     cutoff = std::min(20000.0f, std::max(cutoff, 20.0f));
 
-    if (filterADSROutput > 0) {
-        DBG(filterADSROutput);
-    }
+   
 
     for (int ch = 0; ch < numChannelsToProcess; ++ch)
     {
