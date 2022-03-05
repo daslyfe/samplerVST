@@ -92,6 +92,7 @@ private:
     juce::AudioFormatReader* mFormatReader {nullptr};
     juce::AudioProcessorValueTreeState mAPVTS;
    float beginSample {0};
+    int sampleLength {0};
    
     
   

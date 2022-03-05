@@ -282,10 +282,9 @@ void NewProjectAudioProcessor::loadFile(const juce::String& path)
     synth.clearSounds();
     auto file = juce::File(path);
     mFormatReader = mFormatManager.createReaderFor(file);
-    auto sampleLength = static_cast<int>(mFormatReader->lengthInSamples);
+   sampleLength = static_cast<int>(mFormatReader->lengthInSamples);
     mWaveForm.setSize(1, sampleLength);
     mFormatReader->read(&mWaveForm, 0, sampleLength, 0, true, false);
-   
    
 
     
@@ -355,12 +354,13 @@ void NewProjectAudioProcessor::setFilterParams()
 
 void NewProjectAudioProcessor::setSamplerControlParams()
 {
-    auto& sampleBeginVal = *mAPVTS.getRawParameterValue ("SAMPLE_START");
+    beginSample = mAPVTS.getRawParameterValue ("SAMPLE_START")->load() ;
     auto& sampleEndVal = *mAPVTS.getRawParameterValue ("SAMPLE_END");
     
+    //DBG("sampleLength " << sampleLength << " begin sample " << beginSample);
     
-    beginSample = sampleBeginVal ;
-
+    //beginSample = sampleBeginVal;
+        
 //    for (int i = 0; i < synth.getNumSounds(); ++i)
 //    {
 //        if (auto sound = dynamic_cast<MSamplerSound*>(synth.getSound(i).get()))
@@ -402,7 +402,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
         mAPVTSParams.push_back (std::make_unique<juce::AudioParameterFloat>("LFO1_DEPTH", "LFO1 Depth", juce::NormalisableRange<float> { 0.0f, 10000.0f, 0.1f, 0.3f }, 0.0f, ""));
     
     //samplerControl;
-    mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("SAMPLE_START", "Start", juce::NormalisableRange<float> { 0.0f, 1000.0f, 1.0f }, 0.0f));
+    mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("SAMPLE_START", "Start", juce::NormalisableRange<float> { 0.0f, 1.0f, .001f }, 0.0f));
     mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("SAMPLE_END", "End", 0.0f, 1.0f, 1.0f));
     
     

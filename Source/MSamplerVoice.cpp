@@ -108,12 +108,13 @@ void MSamplerVoice::prepareToPlay (double sampleRate, int samplesPerBlock, int o
 
 void MSamplerVoice::startNote (int midiNoteNumber, float velocity, juce::SynthesiserSound* s, int /*currentPitchWheelPosition*/)
 {
-    DBG(beginSample);
+    //DBG(beginSample);
     if (auto* sound = dynamic_cast<const MSamplerSound*> (s))
     {
         pitchRatio = std::pow (2.0, (midiNoteNumber - sound->midiRootNote) / 12.0)
                         * sound->sourceSampleRate / getSampleRate();
-        sourceSamplePosition =  beginSample * 100;
+        sourceSamplePosition =  (int)(beginSample * sound->length);
+       
         lgain = velocity;
         rgain = velocity;
 
