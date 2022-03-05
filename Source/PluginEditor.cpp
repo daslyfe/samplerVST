@@ -10,11 +10,12 @@
 #include "PluginEditor.h"
 
 
+
 //==============================================================================
 // constructor
 NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor (NewProjectAudioProcessor& p)
 // instantiation list
-    : AudioProcessorEditor (&p), mWaveThumbnail(p), mADSR(p), mFilter(p), mFilterADSR(p),  audioProcessor (p)
+    : AudioProcessorEditor (&p), mWaveThumbnail(p), mADSR(p), mFilter(p), mFilterADSR(p), samplerControl(p), audioProcessor (p)
 {
 
     
@@ -23,6 +24,7 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor (NewProjectAudioP
     addAndMakeVisible(mADSR);
     addAndMakeVisible(mFilter);
     addAndMakeVisible(mFilterADSR);
+    addAndMakeVisible(samplerControl);
 
     
 //juce:startTimerHz(30);
@@ -50,7 +52,7 @@ void NewProjectAudioProcessorEditor::paint (juce::Graphics& g)
 
     
 
-    
+
     
 }
 
@@ -60,10 +62,13 @@ void NewProjectAudioProcessorEditor::paint (juce::Graphics& g)
 
 void NewProjectAudioProcessorEditor::resized()
 {
+    const float dialComponentWidth = 0.5f;
+    const float dialComponentHeight = 0.25f;
     mWaveThumbnail.setBoundsRelative(0.0f, 0.25f, 1.0f, 0.5f);
-    mADSR.setBoundsRelative(0.0f, 0.0f, 0.5f, 0.25f);
-    mFilter.setBoundsRelative(0.5f, 0.75f, 0.5f, 0.25f);
-    mFilterADSR.setBoundsRelative(0.0f, 0.75f, 0.5f, 0.25f);
+    mADSR.setBoundsRelative(0.0f, 0.0f, dialComponentWidth, dialComponentHeight);
+    mFilter.setBoundsRelative(0.5f, 0.75f, dialComponentWidth,  dialComponentHeight);
+    mFilterADSR.setBoundsRelative(0.0f, 0.75f, dialComponentWidth, dialComponentHeight);
+    samplerControl.setBoundsRelative(0.5f, 0.0f,dialComponentWidth, dialComponentHeight);
 
     
     

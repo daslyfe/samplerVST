@@ -64,6 +64,7 @@ public:
     void updateADSR();
     void setFilterParams();
     void setParams();
+    void setSamplerControlParams();
     
     
         
@@ -80,6 +81,8 @@ private:
     juce::Synthesiser synth;
     const int mNumVoices {8};
     juce::AudioBuffer<float> mWaveForm;
+    juce::AudioBuffer<float> tempBuffer;
+    
     juce::dsp::LadderFilter<float> mFilter;
     juce::ADSR::Parameters mADSRParams;
     juce::ADSR::Parameters FilterADSRParams;
@@ -88,6 +91,7 @@ private:
     juce::AudioFormatManager mFormatManager;
     juce::AudioFormatReader* mFormatReader {nullptr};
     juce::AudioProcessorValueTreeState mAPVTS;
+   float beginSample {0};
    
     
   

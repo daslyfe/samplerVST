@@ -66,7 +66,11 @@ bool MSamplerSound::appliesToChannel (int /*midiChannel*/)
 }
 
 //==============================================================================
-MSamplerVoice::MSamplerVoice() {}
+MSamplerVoice::MSamplerVoice(juce::AudioProcessorValueTreeState* apvts): mAPVTS(apvts) {
+   
+    
+}
+
 MSamplerVoice::~MSamplerVoice() {}
 
 bool MSamplerVoice::canPlaySound (juce::SynthesiserSound* sound)
@@ -108,8 +112,7 @@ void MSamplerVoice::startNote (int midiNoteNumber, float velocity, juce::Synthes
     {
         pitchRatio = std::pow (2.0, (midiNoteNumber - sound->midiRootNote) / 12.0)
                         * sound->sourceSampleRate / getSampleRate();
-
-        sourceSamplePosition = 0.0;
+        sourceSamplePosition =  0;
         lgain = velocity;
         rgain = velocity;
 
@@ -152,15 +155,29 @@ void MSamplerVoice::renderNextBlock (juce::AudioBuffer<float>& outputBuffer, int
     jassert (isPrepared);
     if (auto* playingSound = static_cast<MSamplerSound*> (getCurrentlyPlayingSound().get()))
     {
+        
         auto& data = *playingSound->data;
-        const float* const inL = data.getReadPointer (0);
-        const float* const inR = data.getNumChannels() > 1 ? data.getReadPointer (1) : nullptr;
+        //DBG(startSample);
 
-        float* outL = outputBuffer.getWritePointer (0, startSample);
-        float* outR = outputBuffer.getNumChannels() > 1 ? outputBuffer.getWritePointer (1, startSample) : nullptr;
+        // int startSample2 = 100000;
+        int bufferStart = 0;
+        //data.clear(0, 100000);
+       // int sampleStart2 = (int)round(startSample * data.getNumSamples());
+        const float* const inL = data.getReadPointer (0, bufferStart);
+        
+        
+        
+       
+        
+        const float* const inR = data.getNumChannels() > 1 ? data.getReadPointer (1, bufferStart) : nullptr;
 
+        float* outL = outputBuffer.getWritePointer (0, 0);
+        float* outR = outputBuffer.getNumChannels() > 1 ? outputBuffer.getWritePointer (1, 0) : nullptr;
         while (--numSamples >= 0)
         {
+            
+         
+          
             auto pos = (int) sourceSamplePosition;
             auto alpha = (float) (sourceSamplePosition - pos);
             auto invAlpha = 1.0f - alpha;
@@ -168,7 +185,7 @@ void MSamplerVoice::renderNextBlock (juce::AudioBuffer<float>& outputBuffer, int
             filterADSROutput = filterADSR.getNextSample();
 
             // just using a very simple linear interpolation here..
-            float l = (inL[pos] * invAlpha + inL[pos + 1] * alpha);
+            float l = (inL[pos] * invAlpha) + (inL[pos + 1] * alpha);
             float r = (inR != nullptr) ? (inR[pos] * invAlpha + inR[pos + 1] * alpha)
                                        : l;
 //            for (int i = 0; i < 1; ++i) {
@@ -194,6 +211,12 @@ void MSamplerVoice::renderNextBlock (juce::AudioBuffer<float>& outputBuffer, int
             }
 
             sourceSamplePosition += pitchRatio;
+            
+//            if (sourceSamplePosition < startSample) {
+//                sourceSamplePosition = startSample;
+//            }
+    
+        
 
             if (sourceSamplePosition > playingSound->length)
             {
@@ -233,3 +256,54 @@ void MSamplerVoice::updateModParams (const int filterType, const float filterCut
 //    }
 }
 
+
+//std::tuple<double, Direction> MSamplerVoice::getNextState (double freq,
+//                                            double begin,
+//                                            double end)
+//{
+//    auto nextPitchRatio = freq / samplerSound->getCentreFrequencyInHz();
+//
+//    auto nextSamplePos = currentSamplePos;
+//    auto nextDirection = currentDirection;
+//
+//    // Move the current sample pos in the correct direction
+//    switch (currentDirection)
+//    {
+//        case Direction::forward:
+//            nextSamplePos += nextPitchRatio;
+//            break;
+//
+//        case Direction::backward:
+//            nextSamplePos -= nextPitchRatio;
+//            break;
+//
+//        default:
+//            break;
+//    }
+//
+//    // Update current sample position, taking loop mode into account
+//    // If the loop mode was changed while we were travelling backwards, deal
+//    // with it gracefully.
+//    if (nextDirection == Direction::backward && nextSamplePos < begin)
+//    {
+//        nextSamplePos = begin;
+//        nextDirection = Direction::forward;
+//
+//        return std::tuple<double, Direction> (nextSamplePos, nextDirection);
+//    }
+//
+//    if (samplerSound->getLoopMode() == LoopMode::none)
+//        return std::tuple<double, Direction> (nextSamplePos, nextDirection);
+//
+//    if (nextDirection == Direction::forward && end < nextSamplePos && !isTailingOff())
+//    {
+//        if (samplerSound->getLoopMode() == LoopMode::forward)
+//            nextSamplePos = begin;
+//        else if (samplerSound->getLoopMode() == LoopMode::pingpong)
+//        {
+//            nextSamplePos = end;
+//            nextDirection = Direction::backward;
+//        }
+//    }
+//    return std::tuple<double, Direction> (nextSamplePos, nextDirection);
+//}

@@ -14,6 +14,7 @@
 #include "ADSRComponent.h"
 #include "FilterComponent.h"
 #include "FilterADSRComponent.h"
+#include "SamplerControl.h"
 
 
 //==============================================================================
@@ -43,6 +44,7 @@ private:
     ADSRComponent mADSR;
     FilterComponent mFilter;
     FilterADSRComponent mFilterADSR;
+    SamplerControl samplerControl;
     
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.

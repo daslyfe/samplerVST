@@ -5,6 +5,13 @@
 #include "FilterData.h"
 
 
+
+enum class Direction
+{
+    forward,
+    backward
+};
+
 //==============================================================================
 /**
     A subclass of SynthesiserSound that represents a sampled audio clip.
@@ -79,6 +86,7 @@ private:
     juce::BigInteger midiNotes;
     int length = 0, midiRootNote = 0;
 
+
     juce::ADSR::Parameters vcaADSRParams;
 
     
@@ -103,7 +111,7 @@ class  MSamplerVoice    : public juce::SynthesiserVoice
 public:
     //==============================================================================
     /** Creates a MSamplerVoice. */
-    MSamplerVoice();
+    MSamplerVoice(juce::AudioProcessorValueTreeState*);
 
     /** Destructor. */
     ~MSamplerVoice() override;
@@ -131,6 +139,22 @@ private:
     double sourceSamplePosition = 0;
     float lgain = 0, rgain = 0;
     bool isPrepared { false };
+    
+    
+//    std::shared_ptr<const MSamplerSound> samplerSound;
+//    juce::SmoothedValue<double> level { 0 };
+//    juce::SmoothedValue<double> frequency { 0 };
+//    juce::SmoothedValue<double> loopBegin;
+//    juce::SmoothedValue<double> loopEnd;
+//    double previousPressure { 0 };
+//    double currentSamplePos { 0 };
+//    double tailOff { 0 };
+//    Direction currentDirection { Direction::forward };
+//    double smoothingLengthInSeconds { 0.01 };
+//    std::tuple<double, Direction> getNextState (double freq,
+//                                                double begin,
+//                                                double end);
+    juce::AudioProcessorValueTreeState* mAPVTS;
     juce::ADSR filterADSR;
     juce::ADSR adsr;
     juce::ADSR::Parameters filterADSRParams;

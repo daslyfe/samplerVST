@@ -28,7 +28,7 @@ NewProjectAudioProcessor::NewProjectAudioProcessor()
     mFormatManager.registerBasicFormats();
     for (int i=0; i < mNumVoices; i++ ) {
 //        synth.addVoice(new MSamplerVoice());
-        synth.addVoice(new MSamplerVoice());
+        synth.addVoice(new MSamplerVoice(&mAPVTS));
     }
     mAPVTS.state.addListener(this);
 }
@@ -168,6 +168,7 @@ bool NewProjectAudioProcessor::isBusesLayoutSupported (const BusesLayout& layout
 void NewProjectAudioProcessor::setParams () {
     updateADSR();
     setFilterParams();
+    setSamplerControlParams();
     
 }
 
@@ -179,15 +180,23 @@ void NewProjectAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     
 
 
-    for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)  {
-        buffer.clear (i, 0, buffer.getNumSamples()); }
-    
-    
-   
-
+    for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
+    {
+        buffer.clear (i, 0, buffer.getNumSamples());
+        
+    }
+//    int startSample = 0;
+//    if (mFormatReader != nullptr) {
+//
+//        startSample = (int)round(mFormatReader->lengthInSamples * beginSample);
+//
+//
+//    }
+  
+    //DBG("beginSample " << beginSample);
     synth.renderNextBlock(buffer, midiMessages, 0,  buffer.getNumSamples());
-    
-    juce::dsp::AudioBlock<float> sampleBlock(buffer);
+   
+    // juce::dsp::AudioBlock<float> sampleBlock(buffer);
     // mFilter.process(juce::dsp::ProcessContextReplacing<float>(sampleBlock));
 
 //    if (mShouldUpdate)
@@ -276,9 +285,18 @@ void NewProjectAudioProcessor::loadFile(const juce::String& path)
     auto sampleLength = static_cast<int>(mFormatReader->lengthInSamples);
     mWaveForm.setSize(1, sampleLength);
     mFormatReader->read(&mWaveForm, 0, sampleLength, 0, true, false);
+   
+   
 
+    
+    
+    
+    
+   
     juce::BigInteger range;
     range.setRange(0, 128, true);
+    
+        
     synth.addSound(new MSamplerSound("Sample", *mFormatReader, range, 60, 0.1, 0.1, 10.0));
     setParams();
 }
@@ -335,6 +353,26 @@ void NewProjectAudioProcessor::setFilterParams()
     }
 }
 
+void NewProjectAudioProcessor::setSamplerControlParams()
+{
+    auto& sampleBeginVal = *mAPVTS.getRawParameterValue ("SAMPLE_START");
+    auto& sampleEndVal = *mAPVTS.getRawParameterValue ("SAMPLE_END");
+    
+    
+    beginSample = sampleBeginVal;
+
+//    for (int i = 0; i < synth.getNumSounds(); ++i)
+//    {
+//        if (auto sound = dynamic_cast<MSamplerSound*>(synth.getSound(i).get()))
+//        {
+//            sound->setVcaEnvelopeParameters(mADSRParams);
+//                
+//            
+//        }
+//        
+//    }
+}
+
 juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::createParameters()
 {
     //std::vector<std::unique_ptr<juce::RangedAudioParameter>> mAPVTSParams;
@@ -352,6 +390,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
     
     
     mAPVTSParams.push_back (std::make_unique<juce::AudioParameterChoice>("FILTER_TYPE", "Filter Type", juce::StringArray { "Low Pass", "Band Pass", "High Pass" }, 0));
+    
     auto filterCutoffRange = juce::NormalisableRange<float>(30.0f, 20000.0f);
     filterCutoffRange.setSkewForCentre(1200.0f);
     mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("FILTER_CUTOFF", "Cutoff", filterCutoffRange, 20000.0f));
@@ -361,6 +400,11 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
     // LFO
         mAPVTSParams.push_back (std::make_unique<juce::AudioParameterFloat>("LFO1_FREQ", "LFO1 Frequency", juce::NormalisableRange<float> { 0.0f, 20.0f, 0.1f }, 0.0f, "Hz"));
         mAPVTSParams.push_back (std::make_unique<juce::AudioParameterFloat>("LFO1_DEPTH", "LFO1 Depth", juce::NormalisableRange<float> { 0.0f, 10000.0f, 0.1f, 0.3f }, 0.0f, ""));
+    
+    //samplerControl;
+    mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("SAMPLE_START", "Start", juce::NormalisableRange<float> { 0.0f, 1000.0f, 1.0f }, 0.0f));
+    mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("SAMPLE_END", "End", 0.0f, 1.0f, 1.0f));
+    
     
     
     

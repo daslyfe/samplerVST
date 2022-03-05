@@ -4,6 +4,16 @@
               addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn"
               defines="JUCE_MODAL_LOOPS_PERMITTED=1" displaySplashScreen="1">
   <MAINGROUP id="VLTn3L" name="jadeSampler">
+    <GROUP id="{12689B13-0C3F-D20E-3547-8217F4DE8DBE}" name="voice">
+      <FILE id="zCTlmY" name="MPESamplerSound.cpp" compile="1" resource="0"
+            file="Source/MPESamplerSound.cpp"/>
+      <FILE id="wjShb5" name="MPESamplerSound.h" compile="0" resource="0"
+            file="Source/MPESamplerSound.h"/>
+      <FILE id="aocNow" name="MPESamplerVoice.cpp" compile="1" resource="0"
+            file="Source/MPESamplerVoice.cpp"/>
+      <FILE id="mkA6aP" name="MPESamplerVoice.h" compile="0" resource="0"
+            file="Source/MPESamplerVoice.h"/>
+    </GROUP>
     <GROUP id="{DAFBC1E4-500C-E22E-2B2E-C075317D6365}" name="Source">
       <GROUP id="{85AF23D1-FC32-A585-1759-CB51447B411B}" name="deprecate">
         <FILE id="O0W3ni" name="SynthVoice.cpp" compile="1" resource="0" file="Source/SynthVoice.cpp"/>
@@ -25,6 +35,10 @@
             file="Source/MSamplerVoice.cpp"/>
       <FILE id="USv65G" name="MSamplerVoice.h" compile="0" resource="0" file="Source/MSamplerVoice.h"/>
       <FILE id="XG68II" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
+      <FILE id="w6eMaI" name="SamplerControl.cpp" compile="1" resource="0"
+            file="Source/SamplerControl.cpp"/>
+      <FILE id="mcn5kJ" name="SamplerControl.h" compile="0" resource="0"
+            file="Source/SamplerControl.h"/>
       <FILE id="B63c0p" name="WaveThumbnail.cpp" compile="1" resource="0"
             file="Source/WaveThumbnail.cpp"/>
       <FILE id="iXAxGI" name="WaveThumbnail.h" compile="0" resource="0" file="Source/WaveThumbnail.h"/>
