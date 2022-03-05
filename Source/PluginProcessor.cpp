@@ -28,7 +28,7 @@ NewProjectAudioProcessor::NewProjectAudioProcessor()
     mFormatManager.registerBasicFormats();
     for (int i=0; i < mNumVoices; i++ ) {
 //        synth.addVoice(new MSamplerVoice());
-        synth.addVoice(new MSamplerVoice(&mAPVTS));
+        synth.addVoice(new MSamplerVoice(beginSample));
     }
     mAPVTS.state.addListener(this);
 }
@@ -359,7 +359,7 @@ void NewProjectAudioProcessor::setSamplerControlParams()
     auto& sampleEndVal = *mAPVTS.getRawParameterValue ("SAMPLE_END");
     
     
-    beginSample = sampleBeginVal;
+    beginSample = sampleBeginVal ;
 
 //    for (int i = 0; i < synth.getNumSounds(); ++i)
 //    {

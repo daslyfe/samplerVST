@@ -66,7 +66,7 @@ bool MSamplerSound::appliesToChannel (int /*midiChannel*/)
 }
 
 //==============================================================================
-MSamplerVoice::MSamplerVoice(juce::AudioProcessorValueTreeState* apvts): mAPVTS(apvts) {
+MSamplerVoice::MSamplerVoice(float&  beginSampleRef): beginSample(beginSampleRef) {
    
     
 }
@@ -108,11 +108,12 @@ void MSamplerVoice::prepareToPlay (double sampleRate, int samplesPerBlock, int o
 
 void MSamplerVoice::startNote (int midiNoteNumber, float velocity, juce::SynthesiserSound* s, int /*currentPitchWheelPosition*/)
 {
+    DBG(beginSample);
     if (auto* sound = dynamic_cast<const MSamplerSound*> (s))
     {
         pitchRatio = std::pow (2.0, (midiNoteNumber - sound->midiRootNote) / 12.0)
                         * sound->sourceSampleRate / getSampleRate();
-        sourceSamplePosition =  0;
+        sourceSamplePosition =  beginSample * 100;
         lgain = velocity;
         rgain = velocity;
 

@@ -111,7 +111,7 @@ class  MSamplerVoice    : public juce::SynthesiserVoice
 public:
     //==============================================================================
     /** Creates a MSamplerVoice. */
-    MSamplerVoice(juce::AudioProcessorValueTreeState*);
+    MSamplerVoice(float& beginSample);
 
     /** Destructor. */
     ~MSamplerVoice() override;
@@ -154,7 +154,7 @@ private:
 //    std::tuple<double, Direction> getNextState (double freq,
 //                                                double begin,
 //                                                double end);
-    juce::AudioProcessorValueTreeState* mAPVTS;
+    float& beginSample;
     juce::ADSR filterADSR;
     juce::ADSR adsr;
     juce::ADSR::Parameters filterADSRParams;
