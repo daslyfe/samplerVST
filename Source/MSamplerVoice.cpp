@@ -152,55 +152,116 @@ void MSamplerVoice::pitchWheelMoved (int /*newValue*/) {}
 void MSamplerVoice::controllerMoved (int /*controllerNumber*/, int /*newValue*/) {}
 
 //==============================================================================
+//void MSamplerVoice::renderNextBlock (juce::AudioBuffer<float>& outputBuffer, int startSample, int numSamples)
+//{
+//    jassert (isPrepared);
+//    if (auto* playingSound = static_cast<MSamplerSound*> (getCurrentlyPlayingSound().get()))
+//    {
+//
+//        auto& data = *playingSound->data;
+//        //DBG(startSample);
+//
+//        // int startSample2 = 100000;
+//
+//        //data.clear(0, 100000);
+//       // int sampleStart2 = (int)round(startSample * data.getNumSamples());
+//        const float* const inL = data.getReadPointer (0, startSample);
+//
+//
+//
+//
+//
+//        const float* const inR = data.getNumChannels() > 1 ? data.getReadPointer (1, startSample) : nullptr;
+//
+//        float* outL = outputBuffer.getWritePointer (0, 0);
+//        float* outR = outputBuffer.getNumChannels() > 1 ? outputBuffer.getWritePointer (1, 0) : nullptr;
+//        while (--numSamples >= 0)
+//        {
+//
+//
+//
+//            auto pos = (int) sourceSamplePosition;
+//            auto alpha = (float) (sourceSamplePosition - pos);
+//            auto invAlpha = 1.0f - alpha;
+//            auto envelopeValue = adsr.getNextSample();
+//            filterADSROutput = filterADSR.getNextSample();
+//
+//            // just using a very simple linear interpolation here..
+//            float l = (inL[pos] * invAlpha) + (inL[pos + 1] * alpha);
+//            float r = (inR != nullptr) ? (inR[pos] * invAlpha + inR[pos + 1] * alpha)
+//                                       : l;
+////            for (int i = 0; i < 1; ++i) {
+//                l = filter[0].processNextSample (0, l);
+//                r = filter[1].processNextSample(1, r);
+////            }
+//
+//
+//
+//
+//            l *= lgain * envelopeValue;
+//            r *= rgain * envelopeValue;
+//
+//
+//            if (outR != nullptr)
+//            {
+//                *outL++ += l;
+//                *outR++ += r;
+//            }
+//            else
+//            {
+//                *outL++ += (l + r) * 0.5f;
+//            }
+//
+//            sourceSamplePosition += pitchRatio;
+//
+////            if (sourceSamplePosition < startSample) {
+////                sourceSamplePosition = startSample;
+////            }
+//
+//
+//
+//            if (sourceSamplePosition > playingSound->length)
+//            {
+//                stopNote (0.0f, false);
+//                break;
+//            }
+//        }
+//
+//
+//
+//
+//    }
+//}
 void MSamplerVoice::renderNextBlock (juce::AudioBuffer<float>& outputBuffer, int startSample, int numSamples)
 {
-    jassert (isPrepared);
     if (auto* playingSound = static_cast<MSamplerSound*> (getCurrentlyPlayingSound().get()))
     {
-        
         auto& data = *playingSound->data;
-        //DBG(startSample);
+        const float* const inL = data.getReadPointer (0);
+        const float* const inR = data.getNumChannels() > 1 ? data.getReadPointer (1) : nullptr;
 
-        // int startSample2 = 100000;
-        int bufferStart = 0;
-        //data.clear(0, 100000);
-       // int sampleStart2 = (int)round(startSample * data.getNumSamples());
-        const float* const inL = data.getReadPointer (0, bufferStart);
-        
-        
-        
-       
-        
-        const float* const inR = data.getNumChannels() > 1 ? data.getReadPointer (1, bufferStart) : nullptr;
+        float* outL = outputBuffer.getWritePointer (0, startSample);
+        float* outR = outputBuffer.getNumChannels() > 1 ? outputBuffer.getWritePointer (1, startSample) : nullptr;
 
-        float* outL = outputBuffer.getWritePointer (0, 0);
-        float* outR = outputBuffer.getNumChannels() > 1 ? outputBuffer.getWritePointer (1, 0) : nullptr;
         while (--numSamples >= 0)
         {
-            
-         
-          
             auto pos = (int) sourceSamplePosition;
             auto alpha = (float) (sourceSamplePosition - pos);
             auto invAlpha = 1.0f - alpha;
-            auto envelopeValue = adsr.getNextSample();
-            filterADSROutput = filterADSR.getNextSample();
 
             // just using a very simple linear interpolation here..
-            float l = (inL[pos] * invAlpha) + (inL[pos + 1] * alpha);
+            float l = (inL[pos] * invAlpha + inL[pos + 1] * alpha);
             float r = (inR != nullptr) ? (inR[pos] * invAlpha + inR[pos + 1] * alpha)
                                        : l;
-//            for (int i = 0; i < 1; ++i) {
-                l = filter[0].processNextSample (0, l);
-                r = filter[1].processNextSample(1, r);
-//            }
-            
 
-              
+            auto envelopeValue = adsr.getNextSample();
+            filterADSROutput = filterADSR.getNextSample();
+            
+            l = filter[0].processNextSample (0, l);
+            r = filter[1].processNextSample(1, r);
 
             l *= lgain * envelopeValue;
             r *= rgain * envelopeValue;
-            
 
             if (outR != nullptr)
             {
@@ -213,12 +274,6 @@ void MSamplerVoice::renderNextBlock (juce::AudioBuffer<float>& outputBuffer, int
             }
 
             sourceSamplePosition += pitchRatio;
-            
-//            if (sourceSamplePosition < startSample) {
-//                sourceSamplePosition = startSample;
-//            }
-    
-        
 
             if (sourceSamplePosition > playingSound->length)
             {
@@ -226,15 +281,12 @@ void MSamplerVoice::renderNextBlock (juce::AudioBuffer<float>& outputBuffer, int
                 break;
             }
         }
-        
-        
-        
-        
     }
 }
 
 void MSamplerVoice::updateModParams (const int filterType, const float filterCutoff, const float filterResonance, const float adsrDepth, const float lfoFreq, const float lfoDepth)
 {
+    
     auto cutoff = (adsrDepth * filterADSROutput) + filterCutoff;
     cutoff = std::min(20000.0f, std::max(cutoff, 20.0f));
 

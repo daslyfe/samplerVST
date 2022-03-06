@@ -194,6 +194,7 @@ void NewProjectAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
 //    }
   
     //DBG("beginSample " << beginSample);
+
     synth.renderNextBlock(buffer, midiMessages, 0,  buffer.getNumSamples());
    
     // juce::dsp::AudioBlock<float> sampleBlock(buffer);
@@ -284,9 +285,10 @@ void NewProjectAudioProcessor::loadFile(const juce::String& path)
     mFormatReader = mFormatManager.createReaderFor(file);
    sampleLength = static_cast<int>(mFormatReader->lengthInSamples);
     mWaveForm.setSize(1, sampleLength);
+    mWaveForm.reverse(0, sampleLength);
     mFormatReader->read(&mWaveForm, 0, sampleLength, 0, true, false);
    
-
+    
     
     
     
