@@ -10,6 +10,9 @@
 
 #include <JuceHeader.h>
 #include "MSamplerVoice.h"
+#include "MPESamplerVoice.h"
+#include "MPESamplerSound.h"
+
 
 //==============================================================================
 /**
@@ -57,7 +60,7 @@ public:
     
      void loadFileWithMenu();
     void loadFile(const juce::String& path);
-    int getNumSamplerSounds() {return synth.getNumSounds();};
+    int getNumSamplerVoices() {return synth.getNumVoices();};
     
     juce::AudioBuffer<float>& getWaveForm() {return mWaveForm; };
     
@@ -78,12 +81,12 @@ public:
 //    std::atomic<int>& getSampleCount() {return mSampleCount;}
     
 private:
-    juce::Synthesiser synth;
+    juce::MPESynthesiser synth;
     const int mNumVoices {8};
     juce::AudioBuffer<float> mWaveForm;
     juce::AudioBuffer<float> tempBuffer;
     
-    juce::dsp::LadderFilter<float> mFilter;
+ 
     juce::ADSR::Parameters mADSRParams;
     juce::ADSR::Parameters FilterADSRParams;
 
@@ -93,6 +96,9 @@ private:
     juce::AudioProcessorValueTreeState mAPVTS;
    float beginSample {0};
     int sampleLength {0};
+    //std::shared_ptr<const MPESamplerSound> samplerSound;
+    std::shared_ptr<MPESamplerSound> samplerSound = std::make_shared<MPESamplerSound>();
+
    
     
   

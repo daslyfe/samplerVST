@@ -10,14 +10,14 @@
 
 #include <JuceHeader.h>
 #include "MPESamplerSound.h"
-
+#include "FilterData.h"
 
 
 class MPESamplerVoice  : public juce::MPESynthesiserVoice
 {
 public:
-    explicit MPESamplerVoice (std::shared_ptr<const MPESamplerSound> sound)
-        : samplerSound (std::move (sound))
+    explicit MPESamplerVoice (std::shared_ptr<const MPESamplerSound> sound, float& beginSampleRef)
+        : samplerSound (std::move (sound)), beginSample(beginSampleRef)
     {
         jassert (samplerSound != nullptr);
     }
@@ -39,14 +39,20 @@ public:
             smoothed->reset (currentSampleRate, smoothingLengthInSeconds);
 
         previousPressure = currentlyPlayingNote.pressure.asUnsignedFloat();
-        currentSamplePos = 0.0;
+        currentSamplePos = (int)(beginSample * samplerSound->getSample()->getLength());
+        //currentSamplePos = 0.0;
         tailOff          = 0.0;
+        
+        
+        filterADSR.setParameters(filterADSRParams);
+        filterADSR.noteOn();
+
     }
 
     void noteStopped (bool allowTailOff) override
     {
         jassert (currentlyPlayingNote.keyState == juce::MPENote::off);
-
+        filterADSR.noteOff();
         if (allowTailOff && tailOff == 0.0)
             tailOff = 1.0;
         else
@@ -65,9 +71,37 @@ public:
     {
         frequency.setTargetValue (currentlyPlayingNote.getFrequencyInHertz());
     }
+ 
 
     void noteTimbreChanged()   override {}
     void noteKeyStateChanged() override {}
+    
+    void prepareToPlay (double sampleRate, int samplesPerBlock, int outputChannels)
+    {
+        
+      
+    //    reset();
+        
+
+//       filterADSR.setSampleRate (sampleRate);
+//        adsr.setSampleRate (sampleRate);
+
+        juce::dsp::ProcessSpec spec;
+        spec.maximumBlockSize = samplesPerBlock;
+        spec.sampleRate = sampleRate;
+        spec.numChannels = outputChannels;
+
+        for (int ch = 0; ch < numChannelsToProcess; ch++)
+        {
+            filter[ch].prepareToPlay (sampleRate, samplesPerBlock, outputChannels);
+//            lfo[ch].prepare (spec);
+//            lfo[ch].initialise ([](float x) { return std::sin (x); });
+        }
+    //
+    //    gain.prepare (spec);
+    //    gain.setGainLinear (0.07f);
+        isPrepared = true;
+    }
 
     void renderNextBlock (juce::AudioBuffer<float>& outputBuffer,
                           int startSample,
@@ -81,6 +115,22 @@ public:
                           int numSamples) override
     {
         render (outputBuffer, startSample, numSamples);
+    }
+    
+    void setFilterEnvelopeParameters (juce::ADSR::Parameters parametersToUse)
+    {
+        filterADSRParams = parametersToUse;
+    }
+    
+    void updateModParams (const int filterType, const float filterCutoff, const float filterResonance, const float adsrDepth, const float lfoFreq, const float lfoDepth)
+    {
+        auto cutoff = (adsrDepth * filterADSROutput) + filterCutoff;
+        cutoff = std::min(20000.0f, std::max(cutoff, 20.0f));
+
+        for (int ch = 0; ch < numChannelsToProcess; ++ch)
+        {
+            filter[ch].setParams (filterType, cutoff, filterResonance);
+        }
     }
 
     double getCurrentSamplePosition() const
@@ -149,8 +199,13 @@ private:
         // just using a very simple linear interpolation here..
         auto l = static_cast<Element> (currentLevel * (inL[pos] * invAlpha + inL[nextPos] * alpha));
         auto r = static_cast<Element> ((inR != nullptr) ? currentLevel * (inR[pos] * invAlpha + inR[nextPos] * alpha)
-                                                        : l);
+                                                    : l);
 
+        filterADSROutput = filterADSR.getNextSample();
+        l = filter[0].processNextSample (0, l);
+        r = filter[1].processNextSample(1, r);
+        
+        
         if (outR != nullptr)
         {
             outL[writePos] += l;
@@ -185,6 +240,8 @@ private:
     {
         clearCurrentNote();
         currentSamplePos = 0.0;
+        
+
     }
 
     enum class Direction
@@ -254,4 +311,12 @@ private:
     double tailOff { 0 };
     Direction currentDirection { Direction::forward };
     double smoothingLengthInSeconds { 0.01 };
+    
+    static constexpr int numChannelsToProcess { 2 };
+    std::array<FilterData, numChannelsToProcess> filter;
+    bool isPrepared {false};
+    juce::ADSR filterADSR;
+    float filterADSROutput { 0.0f };
+    juce::ADSR::Parameters filterADSRParams;
+    float& beginSample;
 };

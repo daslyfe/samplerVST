@@ -261,6 +261,7 @@ void MSamplerVoice::renderNextBlock (juce::AudioBuffer<float>& outputBuffer, int
             
             l = filter[0].processNextSample (0, l);
             r = filter[1].processNextSample(1, r);
+            
 
             l *= lgain * envelopeValue;
             r *= rgain * envelopeValue;

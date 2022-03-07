@@ -26,10 +26,13 @@ mAPVTS(*this, nullptr, "PARAMETERS", createParameters())
 #endif
 {
     mFormatManager.registerBasicFormats();
-    for (int i=0; i < mNumVoices; i++ ) {
-        //        synth.addVoice(new MSamplerVoice());
-        synth.addVoice(new MSamplerVoice(beginSample));
-    }
+    
+
+   
+//    for (int i=0; i < mNumVoices; i++ ) {
+//       synth.addVoice(new MSamplerVoice(beginSample));
+//
+//    }
     mAPVTS.state.addListener(this);
 }
 
@@ -109,7 +112,7 @@ void NewProjectAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
     
     for (int i = 0; i < synth.getNumVoices(); i++)
     {
-        if (auto voice = dynamic_cast<MSamplerVoice*>(synth.getVoice(i)))
+        if (auto voice = dynamic_cast<MPESamplerVoice*>(synth.getVoice(i)))
         {
             voice->prepareToPlay (sampleRate, samplesPerBlock, getTotalNumOutputChannels());
         }
@@ -119,13 +122,7 @@ void NewProjectAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
     juce::dsp::ProcessSpec spec;
     spec.maximumBlockSize = samplesPerBlock;
     spec.sampleRate = sampleRate;
-    mFilter.prepare(spec);
-    
-    
-    mFilter.reset();
-    
-    mFilter.setEnabled(true);
-    mFilter.setMode(juce::dsp::LadderFilterMode::LPF24);
+
     
     
     
@@ -263,25 +260,28 @@ void NewProjectAudioProcessor::setStateInformation (const void* data, int sizeIn
     // whose contents will have been created by the getStateInformation() call.
 }
 
-void NewProjectAudioProcessor::loadFileWithMenu()
-{
-    synth.clearSounds();
-    juce::FileChooser chooser {"Please load a file"};
-    if (chooser.browseForFileToOpen())
-    {
-        auto file = chooser.getResult();
-        mFormatReader = mFormatManager.createReaderFor(file);
-    }
-    juce::BigInteger range;
-    range.setRange(0, 128, true);
-    synth.addSound(new MSamplerSound("Sample", *mFormatReader, range, 60, 0.1, 0.1, 10.0));
-    
-    
-}
+//void NewProjectAudioProcessor::loadFileWithMenu()
+//{
+//    synth.clearSounds();
+//    juce::FileChooser chooser {"Please load a file"};
+//    if (chooser.browseForFileToOpen())
+//    {
+//        auto file = chooser.getResult();
+//        mFormatReader = mFormatManager.createReaderFor(file);
+//    }
+//    juce::BigInteger range;
+//    range.setRange(0, 128, true);
+//
+//    // synth.addSound(new MSamplerSound("Sample", *mFormatReader, range, 60, 0.1, 0.1, 10.0));
+//    synth.addSound(new MPESamplerSound(*mFormatReader, ));
+//
+//
+//}
 
 void NewProjectAudioProcessor::loadFile(const juce::String& path)
 {
-    synth.clearSounds();
+    synth.clearVoices();
+
     auto file = juce::File(path);
     mFormatReader = mFormatManager.createReaderFor(file);
     sampleLength = static_cast<int>(mFormatReader->lengthInSamples);
@@ -290,16 +290,26 @@ void NewProjectAudioProcessor::loadFile(const juce::String& path)
     mFormatReader->read(&mWaveForm, 0, sampleLength, 0, true, false);
     
     
+    auto sound = samplerSound;
+    auto sample = std::unique_ptr<Sample> (new Sample (*mFormatReader, 10.0));
+    auto lengthInSeconds = sample->getLength() / sample->getSampleRate();
+    sound->setLoopPointsInSeconds ({lengthInSeconds * 0.1, lengthInSeconds * 0.9 });
+    sound->setSample (move (sample));
+    
+   
+    for (int i=0; i < mNumVoices; i++ ) {
+       // synth.addVoice(new MSamplerVoice(beginSample));
+        synth.addVoice(new MPESamplerVoice(sound, beginSample));
+    }
     
     
     
-    
-    
-    juce::BigInteger range;
-    range.setRange(0, 128, true);
-    
- 
-    synth.addSound(new MSamplerSound("Sample", *mFormatReader, range, 60, 0.1, 0.1, 10.0));
+//
+//    juce::BigInteger range;
+//    range.setRange(0, 128, true);
+//
+//
+//    synth.addSound(new MSamplerSound("Sample", *mFormatReader, range, 60, 0.1, 0.1, 10.0));
    
     setParams();
 }
@@ -318,17 +328,28 @@ void NewProjectAudioProcessor::updateADSR()
     
     // mFilter.setDrive(1.0f);
     
-    for (int i = 0; i < synth.getNumSounds(); ++i)
-    {
-        if (auto sound = dynamic_cast<MSamplerSound*>(synth.getSound(i).get()))
-        {
-            sound->setVcaEnvelopeParameters(mADSRParams);
-            
-            
-        }
-        
-    }
+//    for (int i = 0; i < synth.getNumSounds(); ++i)
+//    {
+//        if (auto sound = dynamic_cast<MSamplerSound*>(synth.getSound(i).get()))
+//        {
+//            sound->setVcaEnvelopeParameters(mADSRParams);
+//
+//
+//        }
+//
+//    }
+//
     
+//    for (int i = 0; i < synth.getNumVoices(); ++i)
+//    {
+//        if (auto voice = dynamic_cast<MPESamplerSound*>(synth.getVoice(i)))
+//        {
+//            sound->setVcaEnvelopeParameters(mADSRParams);
+//
+//
+//        }
+//
+//    }
 }
 
 void NewProjectAudioProcessor::setFilterParams()
@@ -347,7 +368,7 @@ void NewProjectAudioProcessor::setFilterParams()
     
     for (int i = 0; i < synth.getNumVoices(); ++i)
     {
-        if (auto voice = dynamic_cast<MSamplerVoice*>(synth.getVoice(i)))
+        if (auto voice = dynamic_cast<MPESamplerVoice*>(synth.getVoice(i)))
         {
             voice->updateModParams (filterType, filterCutoff, filterResonance, adsrDepth, lfoFreq, lfoDepth);
             voice->setFilterEnvelopeParameters(FilterADSRParams);
