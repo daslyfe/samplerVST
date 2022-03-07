@@ -37,15 +37,17 @@ MSamplerSound::MSamplerSound (const juce::String& soundName,
       midiNotes (notes),
       midiRootNote (midiNoteForNormalPitch)
 {
+    
     if (sourceSampleRate > 0 && source.lengthInSamples > 0)
     {
         length = juce::jmin ((int) source.lengthInSamples,
                        (int) (maxSampleLengthSeconds * sourceSampleRate));
-
-        data.reset (new juce::AudioBuffer<float> (juce::jmin (2, (int) source.numChannels), length + 4));
-
+        auto buffer = new juce::AudioBuffer<float> (juce::jmin (2, (int) source.numChannels), length + 4);
+       
+        data.reset (buffer);
+    
         source.read (data.get(), 0, length + 4, 0, true, true);
-
+    
         vcaADSRParams.attack  = static_cast<float> (attackTimeSecs);
         vcaADSRParams.release = static_cast<float> (releaseTimeSecs);
     }

@@ -1,10 +1,10 @@
 /*
-  ==============================================================================
-
-    This file contains the basic framework code for a JUCE plugin processor.
-
-  ==============================================================================
-*/
+ ==============================================================================
+ 
+ This file contains the basic framework code for a JUCE plugin processor.
+ 
+ ==============================================================================
+ */
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
@@ -14,20 +14,20 @@
 //==============================================================================
 NewProjectAudioProcessor::NewProjectAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
-     : AudioProcessor (BusesProperties()
-                     #if ! JucePlugin_IsMidiEffect
-                      #if ! JucePlugin_IsSynth
-                       .withInput  ("Input",  juce::AudioChannelSet::stereo(), true)
-                      #endif
-                       .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
-                     #endif
-                       ),
-                        mAPVTS(*this, nullptr, "PARAMETERS", createParameters())
+: AudioProcessor (BusesProperties()
+#if ! JucePlugin_IsMidiEffect
+#if ! JucePlugin_IsSynth
+                  .withInput  ("Input",  juce::AudioChannelSet::stereo(), true)
+#endif
+                  .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
+#endif
+                  ),
+mAPVTS(*this, nullptr, "PARAMETERS", createParameters())
 #endif
 {
     mFormatManager.registerBasicFormats();
     for (int i=0; i < mNumVoices; i++ ) {
-//        synth.addVoice(new MSamplerVoice());
+        //        synth.addVoice(new MSamplerVoice());
         synth.addVoice(new MSamplerVoice(beginSample));
     }
     mAPVTS.state.addListener(this);
@@ -46,29 +46,29 @@ const juce::String NewProjectAudioProcessor::getName() const
 
 bool NewProjectAudioProcessor::acceptsMidi() const
 {
-   #if JucePlugin_WantsMidiInput
+#if JucePlugin_WantsMidiInput
     return true;
-   #else
+#else
     return false;
-   #endif
+#endif
 }
 
 bool NewProjectAudioProcessor::producesMidi() const
 {
-   #if JucePlugin_ProducesMidiOutput
+#if JucePlugin_ProducesMidiOutput
     return true;
-   #else
+#else
     return false;
-   #endif
+#endif
 }
 
 bool NewProjectAudioProcessor::isMidiEffect() const
 {
-   #if JucePlugin_IsMidiEffect
+#if JucePlugin_IsMidiEffect
     return true;
-   #else
+#else
     return false;
-   #endif
+#endif
 }
 
 double NewProjectAudioProcessor::getTailLengthSeconds() const
@@ -79,7 +79,7 @@ double NewProjectAudioProcessor::getTailLengthSeconds() const
 int NewProjectAudioProcessor::getNumPrograms()
 {
     return 1;   // NB: some hosts don't cope very well if you tell them there are 0 programs,
-                // so this should be at least 1, even if you're not really implementing programs.
+    // so this should be at least 1, even if you're not really implementing programs.
 }
 
 int NewProjectAudioProcessor::getCurrentProgram()
@@ -114,18 +114,19 @@ void NewProjectAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
             voice->prepareToPlay (sampleRate, samplesPerBlock, getTotalNumOutputChannels());
         }
     }
-
+    
+    
     juce::dsp::ProcessSpec spec;
     spec.maximumBlockSize = samplesPerBlock;
     spec.sampleRate = sampleRate;
     mFilter.prepare(spec);
-   
+    
     
     mFilter.reset();
-   
+    
     mFilter.setEnabled(true);
     mFilter.setMode(juce::dsp::LadderFilterMode::LPF24);
-   
+    
     
     
     
@@ -142,26 +143,26 @@ void NewProjectAudioProcessor::releaseResources()
 #ifndef JucePlugin_PreferredChannelConfigurations
 bool NewProjectAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 {
-  #if JucePlugin_IsMidiEffect
+#if JucePlugin_IsMidiEffect
     juce::ignoreUnused (layouts);
     return true;
-  #else
+#else
     // This is the place where you check if the layout is supported.
     // In this template code we only support mono or stereo.
     // Some plugin hosts, such as certain GarageBand versions, will only
     // load plugins that support stereo bus layouts.
     if (layouts.getMainOutputChannelSet() != juce::AudioChannelSet::mono()
-     && layouts.getMainOutputChannelSet() != juce::AudioChannelSet::stereo())
+        && layouts.getMainOutputChannelSet() != juce::AudioChannelSet::stereo())
         return false;
-
+    
     // This checks if the input layout matches the output layout
-   #if ! JucePlugin_IsSynth
+#if ! JucePlugin_IsSynth
     if (layouts.getMainOutputChannelSet() != layouts.getMainInputChannelSet())
         return false;
-   #endif
-
+#endif
+    
     return true;
-  #endif
+#endif
 }
 #endif
 
@@ -178,61 +179,61 @@ void NewProjectAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
     
-
-
+    
+    
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
     {
         buffer.clear (i, 0, buffer.getNumSamples());
         
     }
-//    int startSample = 0;
-//    if (mFormatReader != nullptr) {
-//
-//        startSample = (int)round(mFormatReader->lengthInSamples * beginSample);
-//
-//
-//    }
-  
+    //    int startSample = 0;
+    //    if (mFormatReader != nullptr) {
+    //
+    //        startSample = (int)round(mFormatReader->lengthInSamples * beginSample);
+    //
+    //
+    //    }
+    
     //DBG("beginSample " << beginSample);
-
+    
     synth.renderNextBlock(buffer, midiMessages, 0,  buffer.getNumSamples());
-   
+    
     // juce::dsp::AudioBlock<float> sampleBlock(buffer);
     // mFilter.process(juce::dsp::ProcessContextReplacing<float>(sampleBlock));
-
-//    if (mShouldUpdate)
-//    {
-        setParams();
-        
-   // }
-   
+    
+    //    if (mShouldUpdate)
+    //    {
+    setParams();
+    
+    // }
     
     
-//    juce::MidiMessage m;
-//    juce::MidiBuffer::Iterator it {midiMessages};
-//
-//    int sample;
-//    //initializing midi messages list using a constructor
-//    while (it.getNextEvent(m, sample))
-//    {
-//        if (m.isNoteOn())
-//        {
-//            mIsNotePlayed = true;
-//        }
-//        else if (m.isNoteOff())
-//        {
-//            mIsNotePlayed = false;
-//        }
-//    }
-//
-//    mSampleCount = mIsNotePlayed ? mSampleCount += buffer.getNumSamples() : 0;
+    
+    //    juce::MidiMessage m;
+    //    juce::MidiBuffer::Iterator it {midiMessages};
+    //
+    //    int sample;
+    //    //initializing midi messages list using a constructor
+    //    while (it.getNextEvent(m, sample))
+    //    {
+    //        if (m.isNoteOn())
+    //        {
+    //            mIsNotePlayed = true;
+    //        }
+    //        else if (m.isNoteOff())
+    //        {
+    //            mIsNotePlayed = false;
+    //        }
+    //    }
+    //
+    //    mSampleCount = mIsNotePlayed ? mSampleCount += buffer.getNumSamples() : 0;
     
     
     
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
         auto* channelData = buffer.getWritePointer (channel);
-
+        
         // ..do something to the data...
     }
 }
@@ -274,7 +275,7 @@ void NewProjectAudioProcessor::loadFileWithMenu()
     juce::BigInteger range;
     range.setRange(0, 128, true);
     synth.addSound(new MSamplerSound("Sample", *mFormatReader, range, 60, 0.1, 0.1, 10.0));
-
+    
     
 }
 
@@ -283,36 +284,37 @@ void NewProjectAudioProcessor::loadFile(const juce::String& path)
     synth.clearSounds();
     auto file = juce::File(path);
     mFormatReader = mFormatManager.createReaderFor(file);
-   sampleLength = static_cast<int>(mFormatReader->lengthInSamples);
+    sampleLength = static_cast<int>(mFormatReader->lengthInSamples);
     mWaveForm.setSize(1, sampleLength);
-    mWaveForm.reverse(0, sampleLength);
+    
     mFormatReader->read(&mWaveForm, 0, sampleLength, 0, true, false);
-   
     
     
     
     
     
-   
+    
+    
     juce::BigInteger range;
     range.setRange(0, 128, true);
     
-        
+ 
     synth.addSound(new MSamplerSound("Sample", *mFormatReader, range, 60, 0.1, 0.1, 10.0));
+   
     setParams();
 }
 
 void NewProjectAudioProcessor::updateADSR()
 {
     
-   
+    
     // load the pointer address value for the sliders, set the values
     mADSRParams.attack = mAPVTS.getRawParameterValue("ATTACK")->load();
     mADSRParams.decay = mAPVTS.getRawParameterValue("DECAY")->load();
     mADSRParams.sustain = mAPVTS.getRawParameterValue("SUSTAIN")->load();
     mADSRParams.release = mAPVTS.getRawParameterValue("RELEASE")->load();
     
-
+    
     
     // mFilter.setDrive(1.0f);
     
@@ -321,7 +323,7 @@ void NewProjectAudioProcessor::updateADSR()
         if (auto sound = dynamic_cast<MSamplerSound*>(synth.getSound(i).get()))
         {
             sound->setVcaEnvelopeParameters(mADSRParams);
-                
+            
             
         }
         
@@ -331,7 +333,7 @@ void NewProjectAudioProcessor::updateADSR()
 
 void NewProjectAudioProcessor::setFilterParams()
 {
-   
+    
     auto& filterCutoff = *mAPVTS.getRawParameterValue ("FILTER_CUTOFF");
     auto& filterResonance = *mAPVTS.getRawParameterValue ("FILTER_RES");
     auto& filterType = *mAPVTS.getRawParameterValue ("FILTER_TYPE");
@@ -342,14 +344,14 @@ void NewProjectAudioProcessor::setFilterParams()
     FilterADSRParams.decay = mAPVTS.getRawParameterValue("FILTER_DECAY")->load();
     FilterADSRParams.sustain = mAPVTS.getRawParameterValue("FILTER_SUSTAIN")->load();
     FilterADSRParams.release = mAPVTS.getRawParameterValue("FILTER_RELEASE")->load();
-        
+    
     for (int i = 0; i < synth.getNumVoices(); ++i)
     {
         if (auto voice = dynamic_cast<MSamplerVoice*>(synth.getVoice(i)))
         {
             voice->updateModParams (filterType, filterCutoff, filterResonance, adsrDepth, lfoFreq, lfoDepth);
             voice->setFilterEnvelopeParameters(FilterADSRParams);
-
+            
         }
     }
 }
@@ -362,17 +364,17 @@ void NewProjectAudioProcessor::setSamplerControlParams()
     //DBG("sampleLength " << sampleLength << " begin sample " << beginSample);
     
     //beginSample = sampleBeginVal;
-        
-//    for (int i = 0; i < synth.getNumSounds(); ++i)
-//    {
-//        if (auto sound = dynamic_cast<MSamplerSound*>(synth.getSound(i).get()))
-//        {
-//            sound->setVcaEnvelopeParameters(mADSRParams);
-//                
-//            
-//        }
-//        
-//    }
+    
+    //    for (int i = 0; i < synth.getNumSounds(); ++i)
+    //    {
+    //        if (auto sound = dynamic_cast<MSamplerSound*>(synth.getSound(i).get()))
+    //        {
+    //            sound->setVcaEnvelopeParameters(mADSRParams);
+    //
+    //
+    //        }
+    //
+    //    }
 }
 
 juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::createParameters()
@@ -396,12 +398,12 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
     auto filterCutoffRange = juce::NormalisableRange<float>(30.0f, 20000.0f);
     filterCutoffRange.setSkewForCentre(1200.0f);
     mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("FILTER_CUTOFF", "Cutoff", filterCutoffRange, 20000.0f));
-    mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("FILTER_RES", "Res", 0.1f, 10.0f, 0.1f));
+    mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("FILTER_RES", "Res", 0.1f, 20.0f, 0.1f));
     mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("FILTER_DRIVE", "Drive", 1.0f, 10.0f, 1.0f));
     
     // LFO
-        mAPVTSParams.push_back (std::make_unique<juce::AudioParameterFloat>("LFO1_FREQ", "LFO1 Frequency", juce::NormalisableRange<float> { 0.0f, 20.0f, 0.1f }, 0.0f, "Hz"));
-        mAPVTSParams.push_back (std::make_unique<juce::AudioParameterFloat>("LFO1_DEPTH", "LFO1 Depth", juce::NormalisableRange<float> { 0.0f, 10000.0f, 0.1f, 0.3f }, 0.0f, ""));
+    mAPVTSParams.push_back (std::make_unique<juce::AudioParameterFloat>("LFO1_FREQ", "LFO1 Frequency", juce::NormalisableRange<float> { 0.0f, 20.0f, 0.1f }, 0.0f, "Hz"));
+    mAPVTSParams.push_back (std::make_unique<juce::AudioParameterFloat>("LFO1_DEPTH", "LFO1 Depth", juce::NormalisableRange<float> { 0.0f, 10000.0f, 0.1f, 0.3f }, 0.0f, ""));
     
     //samplerControl;
     mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("SAMPLE_START", "Start", juce::NormalisableRange<float> { 0.0f, 1.0f, .001f }, 0.0f));
@@ -410,7 +412,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
     
     
     
-
+    
     
     return {mAPVTSParams.begin(), mAPVTSParams.end()};
 }
@@ -418,7 +420,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
 void NewProjectAudioProcessor::valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged, const juce::Identifier& property)
 {
     mShouldUpdate = true;
-
+    
 }
 
 //==============================================================================
