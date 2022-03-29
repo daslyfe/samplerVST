@@ -27,6 +27,10 @@ SamplerControl::SamplerControl(NewProjectAudioProcessor& p) : audioProcessor (p)
         makeNewSlider(*slider, audioProcessor.getAPVTS());
         addAndMakeVisible(slider->slider);
     }
+    
+    bufferDirectionButton.setTitle("Reverse");
+    reverseSampleButtonAttatchment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.getAPVTS(), "REVERSE_SAMPLE_BUFFER", bufferDirectionButton);
+    addAndMakeVisible(bufferDirectionButton);
 //
 }
 
@@ -49,6 +53,8 @@ void SamplerControl::resized()
         slider->slider.setBoundsRelative(xOffset, YPos, slider->dialWidth, slider->dialHeight);
         xOffset += slider->dialWidth;
     }
+    
+    bufferDirectionButton.setBoundsRelative(0.4f, 0.2f, 0.2f, 0.5f);
     
     // This method is where you should set the bounds of any child
     // components that your component contains..

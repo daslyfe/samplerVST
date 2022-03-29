@@ -27,8 +27,9 @@ public:
 
 private:
     NewProjectAudioProcessor& audioProcessor;
-
+    juce::ToggleButton bufferDirectionButton;
     InitSlider sampleStartSlider, sampleEndSlider;
     InitSlider* sliders[2] = {&sampleStartSlider, &sampleEndSlider};
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> reverseSampleButtonAttatchment;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SamplerControl)
 };

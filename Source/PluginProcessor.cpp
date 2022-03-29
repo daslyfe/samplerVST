@@ -176,7 +176,8 @@ void NewProjectAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
     
-    
+  
+
     
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
     {
@@ -191,7 +192,6 @@ void NewProjectAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     //
     //    }
     
-    //DBG("beginSample " << beginSample);
     
     synth.renderNextBlock(buffer, midiMessages, 0,  buffer.getNumSamples());
     
@@ -286,16 +286,20 @@ void NewProjectAudioProcessor::loadFile(const juce::String& path)
     mFormatReader = mFormatManager.createReaderFor(file);
     sampleLength = static_cast<int>(mFormatReader->lengthInSamples);
     mWaveForm.setSize(1, sampleLength);
-    
+
     mFormatReader->read(&mWaveForm, 0, sampleLength, 0, true, false);
-    
     
     auto sound = samplerSound;
     auto sample = std::unique_ptr<Sample> (new Sample (*mFormatReader, 10.0));
+  if (mAPVTS.getRawParameterValue("REVERSE_SAMPLE_BUFFER")->load()) {
+        sample->reverseBuffer();
+        mWaveForm.reverse(0, mWaveForm.getNumSamples());
+   }
+    
     auto lengthInSeconds = sample->getLength() / sample->getSampleRate();
     sound->setLoopPointsInSeconds ({lengthInSeconds * 0.1, lengthInSeconds * 0.9 });
     sound->setSample (move (sample));
-    
+  
    
     for (int i=0; i < mNumVoices; i++ ) {
        // synth.addVoice(new MSamplerVoice(beginSample));
@@ -323,7 +327,6 @@ void NewProjectAudioProcessor::updateADSR()
     mADSRParams.decay = mAPVTS.getRawParameterValue("DECAY")->load();
     mADSRParams.sustain = mAPVTS.getRawParameterValue("SUSTAIN")->load();
     mADSRParams.release = mAPVTS.getRawParameterValue("RELEASE")->load();
-    
     
     
     // mFilter.setDrive(1.0f);
@@ -412,6 +415,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
     mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("FILTER_SUSTAIN", "Sustain", 0.0f, 1.0f, 1.0f));
     mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("FILTER_RELEASE", "Release", 0.01f, 5.0f, 0.01f));
     mAPVTSParams.push_back (std::make_unique<juce::AudioParameterFloat>("FILTER_ADSR_DEPTH", "Filter ADSR Depth", juce::NormalisableRange<float> { 0.0f, 10000.0f, 0.1f, 0.3f }, 10000.0f, ""));
+
     
     
     mAPVTSParams.push_back (std::make_unique<juce::AudioParameterChoice>("FILTER_TYPE", "Filter Type", juce::StringArray { "Low Pass", "Band Pass", "High Pass" }, 0));
@@ -430,6 +434,9 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
     mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("SAMPLE_START", "Start", juce::NormalisableRange<float> { 0.0f, 1.0f, .001f }, 0.0f));
     mAPVTSParams.push_back(std::make_unique<juce::AudioParameterFloat>("SAMPLE_END", "End", 0.0f, 1.0f, 1.0f));
     
+    mAPVTSParams.push_back(std::make_unique<juce::AudioParameterBool>("REVERSE_SAMPLE_BUFFER", "Reverse Sample Buffer", true));
+    
+
     
     
     

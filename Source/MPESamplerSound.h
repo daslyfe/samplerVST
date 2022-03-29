@@ -37,14 +37,14 @@ public:
     {
         if (length == 0)
             throw std::runtime_error ("Unable to load sample");
-        
         source.read (&data, 0, length + 4, 0, true, true);
-        
+       // data.reverse(0, data.getNumSamples());
     }
     
     double getSampleRate() const                    { return sourceSampleRate; }
     int getLength() const                           { return length; }
     const juce::AudioBuffer<float>& getBuffer() const     { return data; }
+    void reverseBuffer() { data.reverse(0, data.getNumSamples()); }
     
 private:
     double sourceSampleRate;
@@ -59,6 +59,7 @@ public:
     {
         sample = move (value);
         setLoopPointsInSeconds (loopPoints);
+    
     }
     
     Sample* getSample() const
